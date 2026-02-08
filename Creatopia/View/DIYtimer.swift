@@ -11,7 +11,7 @@ import Combine
 
 struct DIYtimer: View {
     @State private var animate: Bool = false
-    static let duration = 5
+    static let duration = 600
     @State private var timeRemaining = DIYtimer.duration
     @State private var showConfetti = false
     @State private var timerFinished = false
@@ -43,46 +43,69 @@ struct DIYtimer: View {
                                 }
 
                             Text(timeString(from: timeRemaining))
-                                .font(.system(size: 60, weight: .semibold)) // larger timer
+                                .font(.system(size: 60, weight: .semibold))
                                 .foregroundColor(.white)
 
                             // Controls visible during countdown
                             if !timerFinished {
-                                HStack(spacing: 24) {
-                                    // Restart Button
-                                    Button(action: {
-                                        timeRemaining = DIYtimer.duration
-                                        timerFinished = false
-                                        showConfetti = false
-                                        isRunning = true
-                                    }) {
-                                        ZStack {
-                                            Circle()
-                                                .fill(Color.mint)
-                                                .frame(width: 100, height: 100)
-                                            Image(systemName: "arrow.clockwise")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 50, height: 50)
-                                                .foregroundColor(.white)
-                                        }
-                                    }
-
-                                    // Pause/Play Button
-                                    if timeRemaining > 0 {
+                                VStack(spacing: 50) {
+                                    // Top row: Restart + Pause/Play
+                                    HStack(spacing: 34) {
+                                        // Restart Button
                                         Button(action: {
-                                            isRunning.toggle()
+                                            timeRemaining = DIYtimer.duration
+                                            timerFinished = false
+                                            showConfetti = false
+                                            isRunning = true
                                         }) {
                                             ZStack {
                                                 Circle()
-                                                    .fill(Color.gray)
+                                                    .fill(Color.wallBlue)
                                                     .frame(width: 100, height: 100)
-                                                Image(systemName: isRunning ? "pause.fill" : "play.fill")
+                                                Image(systemName: "arrow.clockwise")
                                                     .resizable()
+                                                    .bold()
                                                     .scaledToFit()
                                                     .frame(width: 50, height: 50)
                                                     .foregroundColor(.white)
                                             }
+                                            .opacity(0.8)
+                                        }
+
+                                        // Pause/Play Button
+                                        if timeRemaining > 0 {
+                                            Button(action: {
+                                                isRunning.toggle()
+                                            }) {
+                                                ZStack {
+                                                    Circle()
+                                                        .fill(Color.wallBlue)
+                                                        .frame(width: 100, height: 100)
+                                                    Image(systemName: isRunning ? "pause.fill" : "play.fill")
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .frame(width: 50, height: 50)
+                                                        .foregroundColor(.white)
+                                                }
+                                                .opacity(0.8)
+                                            }
+                                        }
+                                    }
+
+                                    // Bottom: "I finished" Button
+                                    Button(action: {
+                                        // Immediately transition to finished state
+                                        isRunning = false
+                                        timerFinished = true
+                                        showConfetti = true
+                                    }) {
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 50)
+                                                .fill(Color.ButtonYellow)
+                                                .frame(width: 230, height: 60)
+                                            Text("I finished")
+                                                .font(.system(size: 28, weight: .bold))
+                                                .foregroundColor(.black)
                                         }
                                     }
                                 }
@@ -106,10 +129,6 @@ struct DIYtimer: View {
                         if timerFinished {
                             Button(action: {
 
-                                timeRemaining = DIYtimer.duration
-                                timerFinished = false
-                                showConfetti = false
-                                isRunning = true
                             }) {
                                 ZStack {
                                     Circle()
