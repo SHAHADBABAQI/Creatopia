@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2146C4D22F387FC8004AF8E2 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2146C4D12F387FC8004AF8E2 /* Color+Hex.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		2146C4D12F387FC8004AF8E2 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
 		3D75307F2F334F8700FDB69B /* Creatopia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Creatopia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -32,6 +37,7 @@
 		3D7530762F334F8700FDB69B = {
 			isa = PBXGroup;
 			children = (
+				2146C4D12F387FC8004AF8E2 /* Color+Hex.swift */,
 				3D7530812F334F8700FDB69B /* Creatopia */,
 				3D7530802F334F8700FDB69B /* Products */,
 			);
@@ -119,6 +125,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2146C4D22F387FC8004AF8E2 /* Color+Hex.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
