@@ -10,7 +10,7 @@ import UIKit
 
 struct DIYtimer: View {
     @State private var animate: Bool = false
-
+@State private var TimeRemaining = 60
     var body: some View {
         ZStack{
             Image("timerBackground")
