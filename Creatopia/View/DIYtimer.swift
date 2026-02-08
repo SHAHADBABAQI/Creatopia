@@ -15,7 +15,7 @@ struct DIYtimer: View {
         ZStack{
             Image("timerBackground")
                 .resizable()
-                .frame(width:1210, height:870)
+                .frame(width:1370, height:1037)
             ZStack{
                 RoundedRectangle(cornerRadius: 16)
                     .fill(Color.panelPink)
