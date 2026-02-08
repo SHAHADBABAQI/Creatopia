@@ -15,6 +15,7 @@ struct DIYtimer: View {
         ZStack{
             Image("timerBackground")
                 .resizable()
+                .frame(width:1210, height:870)
             ZStack{
                 RoundedRectangle(cornerRadius: 16)
                     .fill(Color.panelPink)
@@ -24,10 +25,10 @@ struct DIYtimer: View {
                                 .stroke(Color.panelPink, lineWidth: 5)
                             Text("GO GO GO!")
                                 .font(.system(size: 60, weight: .bold, design: .default))
-                                .foregroundColor(animate ? .blue : .red) // Animatable property
-                                .scaleEffect(animate ? 2.0 : 1.0)       // Animatable property
-                                .onTapGesture {
-                                    withAnimation(.easeInOut(duration: 1.0)) { // Apply animation
+                                .foregroundColor(animate ? .white : .white)
+                                .scaleEffect(animate ? 2.0 : 1.0)
+                                .onAppear() {
+                                    withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
                                         animate.toggle()
                                     }
                                 }
