@@ -33,7 +33,7 @@ struct HomeView: View {
                     //.offset(x: moveArt ? -5 : 5)
                     .animation(.easeInOut(duration: 1).repeatForever(), value: moveArt)
             }
-            .position(x: 180, y: 230)
+            .position(x: 100, y: 166)
             .onAppear { moveArt = true }
 
             // shelf
@@ -42,23 +42,23 @@ struct HomeView: View {
             } label: {
                 Image("shelf")
                     .resizable()
-                    .frame(width: 217.34, height: 258.61)
+                    .frame(width: 240, height: 210)
                     //.offset(x: moveShelf ? -5 : 5)
                     .animation(.easeInOut(duration: 1.2).repeatForever(), value: moveShelf)
             }
-            .position(x: 990, y: 240)
+            .position(x: 898, y: 190)
             .onAppear { moveShelf = true }
 
             // table
             Button {
             } label: {
-                Image("table")
+                Image("2")
                     .resizable()
-                    .frame(width: 720, height: 420)
+                    .frame(width: 588, height: 420)
                     //.offset(x: moveTable ? -6 : 6)
                     .animation(.easeInOut(duration: 1).repeatForever(), value: moveTable)
             }
-            .position(x: 620, y: 620)
+            .position(x: 616, y: 580)
             .onAppear { moveTable = true }
 
             // box
@@ -67,11 +67,11 @@ struct HomeView: View {
             } label: {
                 Image("box")
                     .resizable()
-                    .frame(width: 180, height: 160)
+                    .frame(width: 290, height: 223)
                     //.offset(x: moveBox ? -4 : 4)
                     .animation(.easeInOut(duration: 1.3).repeatForever(), value: moveBox)
             }
-            .position(x: 150, y: 750)
+            .position(x: 161, y: 700)
             .onAppear { moveBox = true }
         }
     }
