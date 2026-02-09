@@ -42,12 +42,12 @@ struct DIYtimer: View {
                                     }
                                 }
 
-                            // Subtitle shown only while running
+                            // Subtitle shown only while running (fixed minutes from initial duration)
                             if !timerFinished {
-                                Text("")
+                                Text("Let’s make something amazing in the next \(DIYtimer.duration / 60) minutes")
                                     .font(.system(size: 36, weight: .medium))
                                     .foregroundColor(.white.opacity(0.95))
-                                    .scaleEffect(animate ? 1.05 : 1.0)
+                                   // .scaleEffect(animate ? 1.05 : 1.0)
                                     .transition(.opacity)
                             }
 
@@ -67,7 +67,7 @@ struct DIYtimer: View {
                                             }) {
                                                 ZStack {
                                                     Circle()
-                                                        .fill(Color.buttonYellow)
+                                                        .fill(Color.ButtonYellow)
                                                         .frame(width: 100, height: 100)
                                                     Image(systemName: isRunning ? "pause.fill" : "play.fill")
                                                         .resizable()
@@ -88,7 +88,7 @@ struct DIYtimer: View {
                                         }) {
                                             ZStack {
                                                 Circle()
-                                                    .fill(Color.buttonYellow)
+                                                    .fill(Color.ButtonYellow)
                                                     .frame(width: 100, height: 100)
                                                 Image(systemName: "checkmark")
                                                     .resizable()
@@ -107,7 +107,7 @@ struct DIYtimer: View {
                                         }) {
                                             ZStack {
                                                 Circle()
-                                                    .fill(Color.buttonYellow)
+                                                    .fill(Color.ButtonYellow)
                                                     .frame(width: 100, height: 100)
                                                 Image(systemName: "arrow.clockwise")
                                                     .resizable()
