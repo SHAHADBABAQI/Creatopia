@@ -16,8 +16,21 @@ struct DIYtimer: View {
     @State private var showConfetti = false
     @State private var timerFinished = false
     @State private var isRunning = true
+    @State private var timeConsumed: Int = 0 // in seconds
 
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+    private var finishedMessage: String {
+        if timeConsumed < 60 {
+            // Show seconds if less than a minute
+            let seconds = max(0, timeConsumed)
+            return "you finished crafting in \(seconds) second\(seconds == 1 ? "" : "s"), yay!"
+        } else {
+            // Show whole minutes (floor)
+            let minutes = max(1, timeConsumed / 60)
+            return "you finished crafting in \(minutes) minute\(minutes == 1 ? "" : "s"), yay!"
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -42,18 +55,25 @@ struct DIYtimer: View {
                                     }
                                 }
 
-                            // Subtitle shown only while running (fixed minutes from initial duration)
+                            // Subtitle while running vs finished
                             if !timerFinished {
                                 Text("Let’s make something amazing in the next \(DIYtimer.duration / 60) minutes")
                                     .font(.system(size: 36, weight: .medium))
                                     .foregroundColor(.white.opacity(0.95))
-                                   // .scaleEffect(animate ? 1.05 : 1.0)
+                                    .transition(.opacity)
+                            } else {
+                                Text(finishedMessage)
+                                    .font(.system(size: 36, weight: .medium))
+                                    .foregroundColor(.white.opacity(0.95))
                                     .transition(.opacity)
                             }
 
-                            Text(timeString(from: timeRemaining))
-                                .font(.system(size: 60, weight: .semibold))
-                                .foregroundColor(.white)
+                            // Show countdown only while not finished
+                            if !timerFinished {
+                                Text(timeString(from: timeRemaining))
+                                    .font(.system(size: 60, weight: .semibold))
+                                    .foregroundColor(.white)
+                            }
 
                             // Controls visible during countdown
                             if !timerFinished {
@@ -79,10 +99,11 @@ struct DIYtimer: View {
                                                 .opacity(0.8)
                                             }
                                         }
-                                        // Bottom: "I finished" Button
+                                        // "I finished" Button
                                         Button(action: {
                                             // Immediately transition to finished state
                                             isRunning = false
+                                            timeConsumed = DIYtimer.duration - timeRemaining
                                             timerFinished = true
                                             showConfetti = true
                                         }) {
@@ -104,6 +125,7 @@ struct DIYtimer: View {
                                             timerFinished = false
                                             showConfetti = false
                                             isRunning = true
+                                            timeConsumed = 0
                                         }) {
                                             ZStack {
                                                 Circle()
@@ -132,6 +154,7 @@ struct DIYtimer: View {
                                 if timeRemaining == 0 {
                                     timerFinished = true
                                     showConfetti = true
+                                    timeConsumed = DIYtimer.duration // consumed entire duration
                                 }
                             }
                         }
