@@ -11,7 +11,7 @@ import Combine
 
 struct DIYtimer: View {
     @State private var animate: Bool = false
-    static let duration = 4900
+    static let duration = 900
     @State private var timeRemaining = DIYtimer.duration
     @State private var showConfetti = false
     @State private var timerFinished = false
@@ -30,7 +30,7 @@ struct DIYtimer: View {
                     .fill(Color.panelPink)
                     .frame(width: 880, height: 600)
                     .overlay(
-                        VStack(spacing: 90) {
+                        VStack(spacing: 60) {
                             // Title switches when the timer finishes
                             Text(timerFinished ? "WELL DONE!" : "GO GO GO!")
                                 .font(.system(size: 90, weight: .bold))
@@ -41,6 +41,15 @@ struct DIYtimer: View {
                                         animate.toggle()
                                     }
                                 }
+
+                            // Subtitle shown only while running
+                            if !timerFinished {
+                                Text("")
+                                    .font(.system(size: 36, weight: .medium))
+                                    .foregroundColor(.white.opacity(0.95))
+                                    .scaleEffect(animate ? 1.05 : 1.0)
+                                    .transition(.opacity)
+                            }
 
                             Text(timeString(from: timeRemaining))
                                 .font(.system(size: 60, weight: .semibold))
