@@ -11,7 +11,7 @@ import Combine
 
 struct DIYtimer: View {
     @State private var animate: Bool = false
-    static let duration = 600
+    static let duration = 4900
     @State private var timeRemaining = DIYtimer.duration
     @State private var showConfetti = false
     @State private var timerFinished = false
@@ -30,7 +30,7 @@ struct DIYtimer: View {
                     .fill(Color.panelPink)
                     .frame(width: 880, height: 600)
                     .overlay(
-                        VStack(spacing: 24) {
+                        VStack(spacing: 90) {
                             // Title switches when the timer finishes
                             Text(timerFinished ? "WELL DONE!" : "GO GO GO!")
                                 .font(.system(size: 90, weight: .bold))
@@ -48,10 +48,48 @@ struct DIYtimer: View {
 
                             // Controls visible during countdown
                             if !timerFinished {
-                                VStack(spacing: 50) {
+                                VStack(spacing: 90) {
                                     // Top row: Restart + Pause/Play
-                                    HStack(spacing: 34) {
-                                        // Restart Button
+                                    HStack(spacing: 250) {
+                                        // Pause/Play Button
+                                        if timeRemaining > 0 {
+                                            Button(action: {
+                                                isRunning.toggle()
+                                            }) {
+                                                ZStack {
+                                                    Circle()
+                                                        .fill(Color.buttonYellow)
+                                                        .frame(width: 100, height: 100)
+                                                    Image(systemName: isRunning ? "pause.fill" : "play.fill")
+                                                        .resizable()
+                                                        .bold()
+                                                        .scaledToFit()
+                                                        .frame(width: 50, height: 50)
+                                                        .foregroundColor(.black)
+                                                }
+                                                .opacity(0.8)
+                                            }
+                                        }
+                                        // Bottom: "I finished" Button
+                                        Button(action: {
+                                            // Immediately transition to finished state
+                                            isRunning = false
+                                            timerFinished = true
+                                            showConfetti = true
+                                        }) {
+                                            ZStack {
+                                                Circle()
+                                                    .fill(Color.buttonYellow)
+                                                    .frame(width: 100, height: 100)
+                                                Image(systemName: "checkmark")
+                                                    .resizable()
+                                                    .bold()
+                                                    .scaledToFit()
+                                                    .frame(width: 50, height: 50)
+                                                    .foregroundColor(.black)
+                                            }
+                                        }
+                                    
                                         Button(action: {
                                             timeRemaining = DIYtimer.duration
                                             timerFinished = false
@@ -60,54 +98,19 @@ struct DIYtimer: View {
                                         }) {
                                             ZStack {
                                                 Circle()
-                                                    .fill(Color.wallBlue)
+                                                    .fill(Color.buttonYellow)
                                                     .frame(width: 100, height: 100)
                                                 Image(systemName: "arrow.clockwise")
                                                     .resizable()
                                                     .bold()
                                                     .scaledToFit()
                                                     .frame(width: 50, height: 50)
-                                                    .foregroundColor(.white)
+                                                    .foregroundColor(.black)
                                             }
                                             .opacity(0.8)
                                         }
-
-                                        // Pause/Play Button
-                                        if timeRemaining > 0 {
-                                            Button(action: {
-                                                isRunning.toggle()
-                                            }) {
-                                                ZStack {
-                                                    Circle()
-                                                        .fill(Color.wallBlue)
-                                                        .frame(width: 100, height: 100)
-                                                    Image(systemName: isRunning ? "pause.fill" : "play.fill")
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .frame(width: 50, height: 50)
-                                                        .foregroundColor(.white)
-                                                }
-                                                .opacity(0.8)
-                                            }
-                                        }
                                     }
 
-                                    // Bottom: "I finished" Button
-                                    Button(action: {
-                                        // Immediately transition to finished state
-                                        isRunning = false
-                                        timerFinished = true
-                                        showConfetti = true
-                                    }) {
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 50)
-                                                .fill(Color.ButtonYellow)
-                                                .frame(width: 230, height: 60)
-                                            Text("I finished")
-                                                .font(.system(size: 28, weight: .bold))
-                                                .foregroundColor(.black)
-                                        }
-                                    }
                                 }
                                 .padding(.top, 20)
                                 .padding(.bottom, 40)
@@ -187,7 +190,8 @@ struct DIYtimer: View {
                     ConfettiPiece(
                         color: colors.randomElement()!,
                         x: CGFloat.random(in: 0...geo.size.width),
-                        delay: Double.random(in: 0...2)
+                        delay: Double.random(in: 0...3),
+                        availableHeight: geo.size.height
                     )
                 }
             }
@@ -199,6 +203,7 @@ struct DIYtimer: View {
         let color: Color
         let x: CGFloat
         let delay: Double
+        let availableHeight: CGFloat
 
         @State private var y: CGFloat = -20
         @State private var rotation: Double = 0
@@ -214,7 +219,7 @@ struct DIYtimer: View {
                         .easeIn(duration: 2.5)
                             .delay(delay)
                     ) {
-                        y = UIScreen.main.bounds.height + 20
+                        y = availableHeight + 20
                         rotation = Double.random(in: 0...360)
                     }
                 }
