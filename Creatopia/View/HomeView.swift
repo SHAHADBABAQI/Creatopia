@@ -18,7 +18,7 @@ struct HomeView: View {
     var body: some View {
         ZStack {
 
-            Image("home")
+            Image("room")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
@@ -29,11 +29,11 @@ struct HomeView: View {
             } label: {
                 Image("Art")
                     .resizable()
-                    .frame(width: 191, height: 247)
+                    .frame(width: 199, height: 247)
                     //.offset(x: moveArt ? -5 : 5)
                     .animation(.easeInOut(duration: 1).repeatForever(), value: moveArt)
             }
-            .position(x: 100, y: 166)
+            .position(x: 115, y: 189)
             .onAppear { moveArt = true }
 
             // shelf
@@ -42,11 +42,11 @@ struct HomeView: View {
             } label: {
                 Image("shelf")
                     .resizable()
-                    .frame(width: 240, height: 210)
+                    .frame(width: 270, height: 210)
                     //.offset(x: moveShelf ? -5 : 5)
                     .animation(.easeInOut(duration: 1.2).repeatForever(), value: moveShelf)
             }
-            .position(x: 898, y: 190)
+            .position(x: 1022, y: 203)
             .onAppear { moveShelf = true }
 
             // table
@@ -58,7 +58,7 @@ struct HomeView: View {
                     //.offset(x: moveTable ? -6 : 6)
                     .animation(.easeInOut(duration: 1).repeatForever(), value: moveTable)
             }
-            .position(x: 616, y: 580)
+            .position(x: 770, y: 668)
             .onAppear { moveTable = true }
 
             // box
@@ -67,11 +67,11 @@ struct HomeView: View {
             } label: {
                 Image("box")
                     .resizable()
-                    .frame(width: 290, height: 223)
+                    .frame(width: 290, height: 252)
                     //.offset(x: moveBox ? -4 : 4)
                     .animation(.easeInOut(duration: 1.3).repeatForever(), value: moveBox)
             }
-            .position(x: 161, y: 700)
+            .position(x: 180, y: 795)
             .onAppear { moveBox = true }
         }
     }
