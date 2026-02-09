@@ -18,10 +18,10 @@ struct RoomView: View {
     }
 
     let gameItems: [GameItem] = [
-        GameItem(name: "طاولة", instruction: "Shake it and see the magic!", position: CGPoint(x: 808, y: 734), size: CGSize(width: 300, height: 180)),
+        GameItem(name: "طاولة", instruction: "Shake it and see the magic!", position: CGPoint(x: 616, y: 580), size: CGSize(width: 300, height: 180)),
         GameItem(name: "رف", instruction: "Put your things here\nKeep them nice and tidy", position: CGPoint(x: 1019, y: 281), size: CGSize(width: 150, height: 120)),
         GameItem(name: "لوحة", instruction: "Draw your ideas!", position: CGPoint(x: 144, y: 384), size: CGSize(width: 200, height: 150)),
-        GameItem(name: "صندوق", instruction: "All your things are here!\nTap to explore", position: CGPoint(x: 259, y: 882), size: CGSize(width: 150, height: 150))
+        GameItem(name: "صندوق", instruction: "All your things are here!\nTap to explore", position: CGPoint(x: 161, y: 700), size: CGSize(width: 150, height: 150))
     ]
 
     @State private var instructionIndex = 0
@@ -51,7 +51,7 @@ struct RoomView: View {
                 HStack(spacing: 15) {
 
                     Text(currentItem.instruction)
-                        .font(.system(size: 24, weight: .semibold))
+                        .font(.system(size: 20, weight: .semibold))
                     
                         .foregroundColor(.black)
                         .multilineTextAlignment(.leading)
