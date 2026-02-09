@@ -18,7 +18,7 @@ struct HomeView: View {
     var body: some View {
         ZStack {
 
-            Image("room")
+            Image("home")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
@@ -46,19 +46,19 @@ struct HomeView: View {
                     //.offset(x: moveShelf ? -5 : 5)
                     .animation(.easeInOut(duration: 1.2).repeatForever(), value: moveShelf)
             }
-            .position(x: 1022, y: 203)
+            .position(x: 1017, y: 211)
             .onAppear { moveShelf = true }
 
             // table
             Button {
             } label: {
-                Image("2")
+                Image("table")
                     .resizable()
-                    .frame(width: 588, height: 420)
+                    .frame(width: 690, height: 457)
                     //.offset(x: moveTable ? -6 : 6)
                     .animation(.easeInOut(duration: 1).repeatForever(), value: moveTable)
             }
-            .position(x: 770, y: 668)
+            .position(x: 702, y: 656)
             .onAppear { moveTable = true }
 
             // box

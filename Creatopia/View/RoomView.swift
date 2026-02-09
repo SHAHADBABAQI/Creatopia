@@ -21,7 +21,7 @@ struct RoomView: View {
         GameItem(name: "طاولة", instruction: "Shake it and see the magic!", position: CGPoint(x: 616, y: 580), size: CGSize(width: 300, height: 180)),
         GameItem(name: "رف", instruction: "Put your things here\nKeep them nice and tidy", position: CGPoint(x: 1019, y: 281), size: CGSize(width: 150, height: 120)),
         GameItem(name: "لوحة", instruction: "Draw your ideas!", position: CGPoint(x: 144, y: 384), size: CGSize(width: 200, height: 150)),
-        GameItem(name: "صندوق", instruction: "All your things are here!\nTap to explore", position: CGPoint(x: 161, y: 700), size: CGSize(width: 150, height: 150))
+        GameItem(name: "صندوق", instruction: "All your things are here!\nTap to explore", position: CGPoint(x: 161, y: 900), size: CGSize(width: 150, height: 150))
     ]
 
     @State private var instructionIndex = 0
@@ -31,7 +31,7 @@ struct RoomView: View {
         ZStack {
 
             // Background image
-            Image("start")
+            Image("room")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
@@ -78,9 +78,9 @@ struct RoomView: View {
                           y: currentItem.position.y - currentItem.size.height/2 - 60)
             }
         }
-        .navigationBarTitle("Home", displayMode: .inline)
+        .navigationBarTitle("HomeView", displayMode: .inline)
     }
 }
 #Preview {
-    HomeView()
+    RoomView()
 }
