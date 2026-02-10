@@ -92,6 +92,8 @@ struct HomeView: View {
                 .onAppear { moveBox = true }
             }
         }
+        .navigationBarBackButtonHidden(true)
+
     }
 }
 

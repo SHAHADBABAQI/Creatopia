@@ -265,6 +265,8 @@ struct drawView: View {
             }
         }
         }
+        .navigationBarBackButtonHidden(true)
+
     }
 
     // Formats seconds as HH:MM:SS

@@ -54,6 +54,7 @@ struct shake: View {
             BigSurprisesOverlay(show: didShake)
                 .allowsHitTesting(false)
         }
+        .navigationBarBackButtonHidden(true)
         .modifier(ShakeDetector {
             withAnimation(.spring(response: 0.25, dampingFraction: 0.60)) {
                 didShake = true
