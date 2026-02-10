@@ -50,7 +50,7 @@ struct HomeView: View {
                 } label: {
                     Image("shelf")
                         .resizable()
-                        .frame(width: 270, height: 210)
+                        .frame(width: 204.32, height: 228.3)
                         .rotationEffect(.degrees(moveShelf ? 3 : -3))
                         .animation(.easeInOut(duration: 0.5).repeatForever(), value: moveShelf)
                 }
