@@ -30,7 +30,7 @@ struct HomeView: View {
                 Image("Art")
                     .resizable()
                     .frame(width: 199, height: 247)
-                    //.offset(x: moveArt ? -5 : 5)
+                    .rotationEffect(.degrees(moveArt ? 1 : -1))
                     .animation(.easeInOut(duration: 1).repeatForever(), value: moveArt)
             }
             .position(x: 115, y: 189)
@@ -43,8 +43,7 @@ struct HomeView: View {
                 Image("shelf")
                     .resizable()
                     .frame(width: 270, height: 210)
-                    //.offset(x: moveShelf ? -5 : 5)
-                    .animation(.easeInOut(duration: 1.2).repeatForever(), value: moveShelf)
+                    .rotationEffect(.degrees(moveShelf ? 1 : -1))                    .animation(.easeInOut(duration: 1.2).repeatForever(), value: moveShelf)
             }
             .position(x: 1017, y: 211)
             .onAppear { moveShelf = true }
@@ -55,8 +54,7 @@ struct HomeView: View {
                 Image("table")
                     .resizable()
                     .frame(width: 690, height: 457)
-                    //.offset(x: moveTable ? -6 : 6)
-                    .animation(.easeInOut(duration: 1).repeatForever(), value: moveTable)
+                    .rotationEffect(.degrees(moveTable ? 0.2 : -0.2))                    .animation(.easeInOut(duration: 1).repeatForever(), value: moveTable)
             }
             .position(x: 702, y: 656)
             .onAppear { moveTable = true }
@@ -68,8 +66,7 @@ struct HomeView: View {
                 Image("box")
                     .resizable()
                     .frame(width: 290, height: 252)
-                    //.offset(x: moveBox ? -4 : 4)
-                    .animation(.easeInOut(duration: 1.3).repeatForever(), value: moveBox)
+                    .rotationEffect(.degrees(moveBox ? 1 : -1))                    .animation(.easeInOut(duration: 1.3).repeatForever(), value: moveBox)
             }
             .position(x: 180, y: 795)
             .onAppear { moveBox = true }
