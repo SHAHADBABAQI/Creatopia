@@ -30,8 +30,8 @@ struct HomeView: View {
                 Image("Art")
                     .resizable()
                     .frame(width: 199, height: 247)
-                    .rotationEffect(.degrees(moveArt ? 1 : -1))
-                    .animation(.easeInOut(duration: 1).repeatForever(), value: moveArt)
+                    .rotationEffect(.degrees(moveArt ? 3 : -3))
+                    .animation(.easeInOut(duration: 0.5).repeatForever(), value: moveArt)
             }
             .position(x: 115, y: 189)
             .onAppear { moveArt = true }
@@ -43,7 +43,7 @@ struct HomeView: View {
                 Image("shelf")
                     .resizable()
                     .frame(width: 270, height: 210)
-                    .rotationEffect(.degrees(moveShelf ? 1 : -1))                    .animation(.easeInOut(duration: 1.2).repeatForever(), value: moveShelf)
+                    .rotationEffect(.degrees(moveShelf ? 3 : -3))                    .animation(.easeInOut(duration: 0.5).repeatForever(), value: moveShelf)
             }
             .position(x: 1017, y: 211)
             .onAppear { moveShelf = true }
@@ -54,7 +54,7 @@ struct HomeView: View {
                 Image("table")
                     .resizable()
                     .frame(width: 690, height: 457)
-                    .rotationEffect(.degrees(moveTable ? 0.2 : -0.2))                    .animation(.easeInOut(duration: 1).repeatForever(), value: moveTable)
+                    .rotationEffect(.degrees(moveTable ? 2 : -2))                    .animation(.easeInOut(duration: 0.5).repeatForever(), value: moveTable)
             }
             .position(x: 702, y: 656)
             .onAppear { moveTable = true }
@@ -66,7 +66,7 @@ struct HomeView: View {
                 Image("box")
                     .resizable()
                     .frame(width: 290, height: 252)
-                    .rotationEffect(.degrees(moveBox ? 1 : -1))                    .animation(.easeInOut(duration: 1.3).repeatForever(), value: moveBox)
+                    .rotationEffect(.degrees(moveBox ? 3 : -3))                    .animation(.easeInOut(duration: 0.5).repeatForever(), value: moveBox)
             }
             .position(x: 180, y: 795)
             .onAppear { moveBox = true }
