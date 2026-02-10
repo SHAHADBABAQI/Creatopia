@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import UIKit
 import Combine
 
 struct DIYtimer: View {
