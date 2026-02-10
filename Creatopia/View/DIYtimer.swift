@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import UIKit
 import Combine
 
 struct DIYtimer: View {
@@ -17,6 +16,7 @@ struct DIYtimer: View {
     @State private var timerFinished = false
     @State private var isRunning = true
     @State private var timeConsumed: Int = 0 // in seconds
+    @State private var goHome: Bool = false  // programmatic navigation flag
 
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -162,17 +162,29 @@ struct DIYtimer: View {
 
                     .overlay(alignment: .bottomLeading) {
                         if timerFinished {
-                            Button(action: {
+                            ZStack {
+                                // Hidden navigation trigger
+                                NavigationLink(isActive: $goHome) {
+                                    HomeView()
+                                } label: {
+                                    EmptyView()
+                                }
+                                .hidden()
 
-                            }) {
-                                ZStack {
-                                    Circle()
-                                        .fill(Color.ButtonYellow)
-                                        .frame(width: 100, height: 100)
-                                    Image(systemName: "house.fill")
-                                        .resizable()
-                                        .frame(width: 80, height: 70)
-                                        .foregroundColor(Color.black)
+                                // Clickable button
+                                Button(action: {
+                                    // Any logic before navigating can go here
+                                    goHome = true
+                                }) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.ButtonYellow)
+                                            .frame(width: 100, height: 100)
+                                        Image(systemName: "house.fill")
+                                            .resizable()
+                                            .frame(width: 80, height: 70)
+                                            .foregroundColor(Color.black)
+                                    }
                                 }
                             }
                             .padding(24)
@@ -260,5 +272,7 @@ struct DIYtimer: View {
 }
 
 #Preview {
-    DIYtimer()
+    NavigationStack {
+        DIYtimer()
+    }
 }
