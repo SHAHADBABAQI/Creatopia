@@ -25,9 +25,16 @@ struct HomeView: View {
                     .ignoresSafeArea()
                 
                 // Art
-                Button {
-                    print("Art tapped")
-                } label: {
+                NavigationLink {
+                    drawView()
+                        .onAppear {
+                            // Restart the wobble animation on navigation if desired
+                            moveArt = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                moveArt = true
+                            }
+                            }
+                        } label: {
                     Image("Art")
                         .resizable()
                         .frame(width: 199, height: 247)
