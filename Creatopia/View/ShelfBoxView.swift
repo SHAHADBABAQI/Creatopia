@@ -44,6 +44,7 @@ struct ShelfBoxView: View {
                                     .padding()
                                     .background(Color(hexString: "FBDC7E"))
                                     .clipShape(Circle())
+                                    .position(x: 120, y:422)
                             }
 
                             Button(action: {
@@ -57,6 +58,8 @@ struct ShelfBoxView: View {
                                     .padding()
                                     .background(Color(hexString: "FBDC7E"))
                                     .clipShape(Circle())
+                                    .position(x: 250, y:422)
+
                             }
                         }
                         .padding(.bottom, 40) // مسافة من أسفل الشاشة
