@@ -46,223 +46,224 @@ struct drawView: View {
     }
 
     var body: some View {
+        NavigationStack{
         ZStack {
             Image("background2")
                 .resizable()
                 .frame(width: 1370, height: 1037)
-
             ZStack {
-              
-                        VStack(spacing: 60) {
-                            // Title switches when the timer finishes
-                            Text(timerFinished ? "WELL DONE!" : "GO GO GO!")
-                                .font(.system(size: 90, weight: .bold))
-                                .foregroundColor(.white)
-                                .scaleEffect(animate ? 1.3 : 1.0)
-                                .onAppear {
-                                    withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                                        animate.toggle()
-                                    }
-                                }
-
-                            // Subtitle while running vs finished
-                            if !timerFinished {
-                                Text("Let’s make something amazing in the next \(DIYtimer.duration / 60) minutes")
-                                    .font(.system(size: 36, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.95))
-                                    .transition(.opacity)
-                            } else {
-                                Text(finishedMessage)
-                                    .font(.system(size: 36, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.95))
-                                    .transition(.opacity)
-                            }
-
-                            // Show countdown only while not finished
-                            if !timerFinished {
-                                Text(timeString(from: timeRemaining))
-                                    .font(.system(size: 60, weight: .semibold))
-                                    .foregroundColor(.white)
-                            }
-
-                            // Controls visible during countdown
-                            if !timerFinished {
-                                VStack(spacing: 90) {
-                                    // Top row: Restart + Pause/Play
-                                    HStack(spacing: 250) {
-                                        // Pause/Play Button
-                                        if timeRemaining > 0 {
-                                            Button(action: {
-                                                isRunning.toggle()
-                                            }) {
-                                                ZStack {
-                                                    Circle()
-                                                        .fill(Color.ButtonYellow)
-                                                        .frame(width: 100, height: 100)
-                                                    Image(systemName: isRunning ? "pause.fill" : "play.fill")
-                                                        .resizable()
-                                                        .bold()
-                                                        .scaledToFit()
-                                                        .frame(width: 50, height: 50)
-                                                        .foregroundColor(.black)
-                                                }
-                                                .opacity(0.8)
-                                            }
-                                        }
-                                        // "I finished" Button
-                                        Button(action: {
-                                            // Immediately transition to finished state
-                                            isRunning = false
-                                            timeConsumed = DIYtimer.duration - timeRemaining
-                                            timerFinished = true
-                                            showConfetti = true
-                                        }) {
-                                            ZStack {
-                                                Circle()
-                                                    .fill(Color.ButtonYellow)
-                                                    .frame(width: 100, height: 100)
-                                                Image(systemName: "checkmark")
-                                                    .resizable()
-                                                    .bold()
-                                                    .scaledToFit()
-                                                    .frame(width: 50, height: 50)
-                                                    .foregroundColor(.black)
-                                            }
-                                        }
-                                    
-                                        Button(action: {
-                                            timeRemaining = DIYtimer.duration
-                                            timerFinished = false
-                                            showConfetti = false
-                                            isRunning = true
-                                            timeConsumed = 0
-                                        }) {
-                                            ZStack {
-                                                Circle()
-                                                    .fill(Color.ButtonYellow)
-                                                    .frame(width: 100, height: 100)
-                                                Image(systemName: "arrow.clockwise")
-                                                    .resizable()
-                                                    .bold()
-                                                    .scaledToFit()
-                                                    .frame(width: 50, height: 50)
-                                                    .foregroundColor(.black)
-                                            }
-                                            .opacity(0.8)
-                                            
-                                        }
-                                    }
-
-                                }
-                                .padding(.top, 20)
-                                .padding(.bottom, -40)
+                
+                VStack(spacing: 60) {
+                    // Title switches when the timer finishes
+                    Text(timerFinished ? "WELL DONE!" : "GO GO GO!")
+                        .font(.system(size: 90, weight: .bold))
+                        .foregroundColor(.white)
+                        .scaleEffect(animate ? 1.3 : 1.0)
+                        .onAppear {
+                            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                                animate.toggle()
                             }
                         }
-                        .onReceive(timer) { _ in
-                            guard isRunning else { return }
-                            if timeRemaining > 0 {
-                                timeRemaining -= 1
-                                if timeRemaining == 0 {
+                    
+                    // Subtitle while running vs finished
+                    if !timerFinished {
+                        Text("Let’s make something amazing in the next \(DIYtimer.duration / 60) minutes")
+                            .font(.system(size: 36, weight: .medium))
+                            .foregroundColor(.white.opacity(0.95))
+                            .transition(.opacity)
+                    } else {
+                        Text(finishedMessage)
+                            .font(.system(size: 36, weight: .medium))
+                            .foregroundColor(.white.opacity(0.95))
+                            .transition(.opacity)
+                    }
+                    
+                    // Show countdown only while not finished
+                    if !timerFinished {
+                        Text(timeString(from: timeRemaining))
+                            .font(.system(size: 60, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
+                    
+                    // Controls visible during countdown
+                    if !timerFinished {
+                        VStack(spacing: 90) {
+                            // Top row: Restart + Pause/Play
+                            HStack(spacing: 250) {
+                                // Pause/Play Button
+                                if timeRemaining > 0 {
+                                    Button(action: {
+                                        isRunning.toggle()
+                                    }) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.ButtonYellow)
+                                                .frame(width: 100, height: 100)
+                                            Image(systemName: isRunning ? "pause.fill" : "play.fill")
+                                                .resizable()
+                                                .bold()
+                                                .scaledToFit()
+                                                .frame(width: 50, height: 50)
+                                                .foregroundColor(.black)
+                                        }
+                                        .opacity(0.8)
+                                    }
+                                }
+                                // "I finished" Button
+                                Button(action: {
+                                    // Immediately transition to finished state
+                                    isRunning = false
+                                    timeConsumed = DIYtimer.duration - timeRemaining
                                     timerFinished = true
                                     showConfetti = true
-                                    timeConsumed = DIYtimer.duration // consumed entire duration
+                                }) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.ButtonYellow)
+                                            .frame(width: 100, height: 100)
+                                        Image(systemName: "checkmark")
+                                            .resizable()
+                                            .bold()
+                                            .scaledToFit()
+                                            .frame(width: 50, height: 50)
+                                            .foregroundColor(.black)
+                                    }
+                                }
+                                
+                                Button(action: {
+                                    timeRemaining = DIYtimer.duration
+                                    timerFinished = false
+                                    showConfetti = false
+                                    isRunning = true
+                                    timeConsumed = 0
+                                }) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.ButtonYellow)
+                                            .frame(width: 100, height: 100)
+                                        Image(systemName: "arrow.clockwise")
+                                            .resizable()
+                                            .bold()
+                                            .scaledToFit()
+                                            .frame(width: 50, height: 50)
+                                            .foregroundColor(.black)
+                                    }
+                                    .opacity(0.8)
+                                    
                                 }
                             }
+                            
                         }
-                    
-
-                    
-//                        if timerFinished {
-//                            Button(action: {
-//
-//                            }) {
-//                                ZStack {
-//                                    Circle()
-//                                        .fill(Color.ButtonYellow)
-//                                        .frame(width: 100, height: 100)
-//                                    Image(systemName: "house.fill")
-//                                        .resizable()
-//                                        .frame(width: 80, height: 70)
-//                                        .foregroundColor(Color.black)
-//                                }
-//                            }
-//                            .padding(24)
-//                        }
-//                    
-//                     
-//                        if timerFinished {
-//                            Button(action: {
-//                                // Camera action
-//                            }) {
-//                                ZStack {
-//                                    Circle()
-//                                        .fill(Color.ButtonYellow)
-//                                        .frame(width: 100, height: 100)
-//                                    Image(systemName: "camera.fill")
-//                                        .resizable()
-//                                        .frame(width: 60, height: 60)
-//                                        .foregroundColor(Color.black)
-//                                }
-//                            }
-//                            .padding(24)
-//                        }
-//                    
-              
-                    // Your main content here (background, canvas, timer, etc.)
-
-                    if timerFinished {
-                        ZStack {
-                            // Your main content here
-
-                            if timerFinished {
-                                VStack {
-                                    Spacer()
-
-                                    HStack {
-                                        // LEFT BUTTON
-                                        Button(action: {}) {
-                                            ZStack {
-                                                Circle()
-                                                    .fill(Color.ButtonYellow)
-                                                    .frame(width: 100, height: 100)
-                                                Image(systemName: "house.fill")
-                                                    .resizable()
-                                                    .frame(width: 80, height: 70)
-                                                    .foregroundColor(.black)
-                                            }
-                                        }
-
-                                        Spacer()
-
-                                        // RIGHT BUTTON
-                                        Button(action: {}) {
-                                            ZStack {
-                                                Circle()
-                                                    .fill(Color.ButtonYellow)
-                                                    .frame(width: 100, height: 100)
-                                                Image(systemName: "camera.fill")
-                                                    .resizable()
-                                                    .frame(width: 60, height: 60)
-                                                    .foregroundColor(.black)
-                                            }
+                        .padding(.top, 20)
+                        .padding(.bottom, -40)
+                    }
+                }
+                .onReceive(timer) { _ in
+                    guard isRunning else { return }
+                    if timeRemaining > 0 {
+                        timeRemaining -= 1
+                        if timeRemaining == 0 {
+                            timerFinished = true
+                            showConfetti = true
+                            timeConsumed = DIYtimer.duration // consumed entire duration
+                        }
+                    }
+                }
+                
+                
+                
+                //                        if timerFinished {
+                //                            Button(action: {
+                //
+                //                            }) {
+                //                                ZStack {
+                //                                    Circle()
+                //                                        .fill(Color.ButtonYellow)
+                //                                        .frame(width: 100, height: 100)
+                //                                    Image(systemName: "house.fill")
+                //                                        .resizable()
+                //                                        .frame(width: 80, height: 70)
+                //                                        .foregroundColor(Color.black)
+                //                                }
+                //                            }
+                //                            .padding(24)
+                //                        }
+                //
+                //
+                //                        if timerFinished {
+                //                            Button(action: {
+                //                                // Camera action
+                //                            }) {
+                //                                ZStack {
+                //                                    Circle()
+                //                                        .fill(Color.ButtonYellow)
+                //                                        .frame(width: 100, height: 100)
+                //                                    Image(systemName: "camera.fill")
+                //                                        .resizable()
+                //                                        .frame(width: 60, height: 60)
+                //                                        .foregroundColor(Color.black)
+                //                                }
+                //                            }
+                //                            .padding(24)
+                //                        }
+                //
+                
+                // Your main content here (background, canvas, timer, etc.)
+                
+                if timerFinished {
+                    ZStack {
+                        // Your main content here
+                        
+                        if timerFinished {
+                            VStack {
+                                Spacer()
+                                
+                                HStack {
+                                    // LEFT BUTTON
+                                    NavigationLink(destination: HomeView()) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.ButtonYellow)
+                                                .frame(width: 100, height: 100)
+                                            Image(systemName: "house.fill")
+                                                .resizable()
+                                                .frame(width: 80, height: 70)
+                                                .foregroundColor(.black)
                                         }
                                     }
-                                    .padding(.horizontal, 24)
-                                    .padding(.bottom, 20) // 👈 CONTROL THIS VALUE
+                                    
+                                    Spacer()
+                                    
+                                    // RIGHT BUTTON
+                                    Button(action: {}) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.ButtonYellow)
+                                                .frame(width: 100, height: 100)
+                                            Image(systemName: "camera.fill")
+                                                .resizable()
+                                                .frame(width: 60, height: 60)
+                                                .foregroundColor(.black)
+                                        }
+                                    }
                                 }
+                                .padding(.horizontal, 24)
+                                .padding(.bottom, 20) // 👈 CONTROL THIS VALUE
                             }
                         }
-                        .frame(width: 760, height: 510)
-
                     }
+                    .frame(width: 760, height: 510)
+                    
+                }
                 
-
                 
-
+                
+                
                 if showConfetti {
                     ConfettiView()
                 }
             }
+        }
         }
     }
 
