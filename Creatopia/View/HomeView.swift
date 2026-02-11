@@ -45,8 +45,16 @@ struct HomeView: View {
                 .onAppear { moveArt = true }
                 
                 // shelf
-                Button {
-                    print("Shelf tapped")
+                NavigationLink {
+                    // Destination when tapping the table
+                    ShelfView()
+                        .onAppear {
+                            // Restart the wobble animation on navigation if desired
+                            moveShelf = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                moveShelf = true
+                            }
+                        }
                 } label: {
                     Image("shelf")
                         .resizable()
@@ -79,8 +87,17 @@ struct HomeView: View {
                 .onAppear { moveTable = true }
                 
                 // box
-                Button {
-                    print("Box tapped")
+                NavigationLink {
+                    // Destination when tapping the table
+                    ShelfBoxView()
+                        .onAppear {
+                            // Restart the wobble animation on navigation if desired
+                            moveBox = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                moveBox = true
+                            }
+                        }
+
                 } label: {
                     Image("box")
                         .resizable()
