@@ -1,13 +1,14 @@
+import UniformTypeIdentifiers
 import SwiftUI
 
 struct ShelfBoxView: View {
     
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var viewModel = ShelfBoxViewModel()
     
     var body: some View {
         ZStack {
             
-            // الخلفية
             Image("shelfbox")
                 .resizable()
                 .scaledToFill()
@@ -16,29 +17,43 @@ struct ShelfBoxView: View {
             GeometryReader { geo in
                 HStack(spacing: 0) {
                     
-                    // LEFT HALF
+                    // LEFT SIDE
                     ZStack {
                         Image("inbox")
                             .resizable()
                             .frame(width: 673, height: 529)
+                        
+                        HStack(spacing: 20) {
+                            ForEach(viewModel.inboxItems) { item in
+                                
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(randomColor(for: item))
+                                    .frame(width: 70, height: 70)
+                                    .onDrag {
+                                        NSItemProvider(object: item.id.uuidString as NSString)
+                                    }
+                            }
+                        }
                     }
-                    .frame(width: geo.size.width / 2, height: geo.size.height)
-                    .position(x: geo.size.width / 3.80, y: geo.size.height / 2)
+                    .frame(width: geo.size.width / 2,
+                           height: geo.size.height)
+                    .position(x: geo.size.width / 3.80,
+                              y: geo.size.height / 2)
                     
                     
-                    // RIGHT HALF
+                    // RIGHT SIDE
                     VStack {
+                        
                         ZStack {
-                            // الرفوف
-                            shelf(x: 366, y: 140)
-                            shelf(x: 366, y: 365)
-                            shelf(x: 366, y: 589)
-                            shelf(x: 366, y: 814)
+                            shelfDrop(index: 0, x: 366, y: 140)
+                            shelfDrop(index: 1, x: 366, y: 365)
+                            shelfDrop(index: 2, x: 366, y: 589)
+                            shelfDrop(index: 3, x: 366, y: 814)
                         }
                         
                         Spacer()
                         
-                        // أزرار الأسهم (مثل ما هي بدون تغيير)
+                        // 🔥 الأسهم نفس مكانك بالضبط
                         HStack(spacing: 40) {
                             
                             Button(action: {
@@ -71,11 +86,12 @@ struct ShelfBoxView: View {
                         }
                         .padding(.bottom, 40)
                     }
-                    .frame(width: geo.size.width / 2, height: geo.size.height)
+                    .frame(width: geo.size.width / 2,
+                           height: geo.size.height)
                 }
             }
             
-            // 🔥 زر الهوم في أقصى اليسار بنفس مستوى الأسهم
+            // HOME
             Button(action: {
                 dismiss()
             }) {
@@ -92,30 +108,79 @@ struct ShelfBoxView: View {
         }
         .navigationBarHidden(true)
     }
-
-    // MARK: - Shelf Component
-    func shelf(x: CGFloat, y: CGFloat) -> some View {
-        Image("shelf1")
-            .resizable()
-            .frame(width: 572, height: 78)
-            .position(x: x, y: y)
+    
+    
+    // MARK: - Shelf Drop
+    
+    func shelfDrop(index: Int, x: CGFloat, y: CGFloat) -> some View {
+        ZStack {
+            Image("shelf1")
+                .resizable()
+                .frame(width: 572, height: 78)
+            
+            if let item = viewModel.shelves[index] {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(randomColor(for: item))
+                    .frame(width: 60, height: 60)
+            }
+        }
+        .position(x: x, y: y)
+        .onDrop(of: [UTType.text], isTargeted: nil) { providers in
+            
+            if let provider = providers.first {
+                provider.loadObject(ofClass: NSString.self) { object, _ in
+                    if let nsString = object as? NSString {
+                        let idString = String(nsString)
+                        if let item = viewModel.inboxItems.first(where: { $0.id.uuidString == idString }) {
+                            DispatchQueue.main.async {
+                                viewModel.placeItem(item, at: index)
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return true
+        }
+    }
+    
+    
+    func randomColor(for item: ShelfItem) -> Color {
+        switch item.imageName {
+        case "item1": return .red
+        case "item2": return .blue
+        case "item3": return .green
+        case "item4": return .orange
+        default: return .gray
+        }
     }
 }
-
-
-// MARK: - HEX Color Support
-extension Color {
-    init(hexString: String) {
-        let scanner = Scanner(string: hexString)
-        var rgb: UInt64 = 0
-        scanner.scanHexInt64(&rgb)
-        let r = Double((rgb >> 16) & 0xFF) / 255
-        let g = Double((rgb >> 8) & 0xFF) / 255
-        let b = Double(rgb & 0xFF) / 255
-        self.init(red: r, green: g, blue: b)
-    }
-}
-
 #Preview {
     ShelfBoxView()
 }
+
+// MARK: - Color + Hex Support
+private extension Color {
+    init?(hexString: String) {
+        // Remove leading '#' if present and ensure 6 or 8 hex chars
+        var hex = hexString.trimmingCharacters(in: .whitespacesAndNewlines)
+        if hex.hasPrefix("#") { hex.removeFirst() }
+        guard hex.count == 6 || hex.count == 8, let intVal = UInt64(hex, radix: 16) else {
+            return nil
+        }
+        let a, r, g, b: Double
+        if hex.count == 8 {
+            a = Double((intVal & 0xFF00_0000) >> 24) / 255.0
+            r = Double((intVal & 0x00FF_0000) >> 16) / 255.0
+            g = Double((intVal & 0x0000_FF00) >> 8) / 255.0
+            b = Double(intVal & 0x0000_00FF) / 255.0
+        } else {
+            a = 1.0
+            r = Double((intVal & 0xFF00_00) >> 16) / 255.0
+            g = Double((intVal & 0x00FF_00) >> 8) / 255.0
+            b = Double(intVal & 0x0000_FF) / 255.0
+        }
+        self = Color(red: r, green: g, blue: b, opacity: a)
+    }
+}
+
