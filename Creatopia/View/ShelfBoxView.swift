@@ -17,7 +17,7 @@ struct ShelfBoxView: View {
             GeometryReader { geo in
                 HStack(spacing: 0) {
                     
-                    // LEFT SIDE
+                    // LEFT SIDE (Inbox)
                     ZStack {
                         Image("inbox")
                             .resizable()
@@ -25,7 +25,6 @@ struct ShelfBoxView: View {
                         
                         HStack(spacing: 20) {
                             ForEach(viewModel.inboxItems) { item in
-                                
                                 RoundedRectangle(cornerRadius: 12)
                                     .fill(randomColor(for: item))
                                     .frame(width: 70, height: 70)
@@ -41,7 +40,7 @@ struct ShelfBoxView: View {
                               y: geo.size.height / 2)
                     
                     
-                    // RIGHT SIDE
+                    // RIGHT SIDE (Shelves)
                     VStack {
                         
                         ZStack {
@@ -53,11 +52,11 @@ struct ShelfBoxView: View {
                         
                         Spacer()
                         
-                        // 🔥 الأسهم نفس مكانك بالضبط
+                        // 🔥 الأسهم نفس مكانك بالضبط (بس غيرت الأكشن)
                         HStack(spacing: 40) {
                             
                             Button(action: {
-                                print("Left arrow tapped")
+                                viewModel.previousPage()
                             }) {
                                 Image(systemName: "chevron.left")
                                     .resizable()
@@ -65,13 +64,13 @@ struct ShelfBoxView: View {
                                     .frame(width: 70, height: 70)
                                     .foregroundColor(.black)
                                     .padding()
-                                    .background(Color(hexString: "FBDC7E"))
+                                    .background(Color(red: 0.988, green: 0.863, blue: 0.494))
                                     .clipShape(Circle())
                                     .position(x: 120, y: 422)
                             }
                             
                             Button(action: {
-                                print("Right arrow tapped")
+                                viewModel.nextPage()
                             }) {
                                 Image(systemName: "chevron.right")
                                     .resizable()
@@ -79,7 +78,7 @@ struct ShelfBoxView: View {
                                     .frame(width: 70, height: 70)
                                     .foregroundColor(.black)
                                     .padding()
-                                    .background(Color(hexString: "FBDC7E"))
+                                    .background(Color(red: 0.988, green: 0.863, blue: 0.494))
                                     .clipShape(Circle())
                                     .position(x: 250, y: 422)
                             }
@@ -91,7 +90,7 @@ struct ShelfBoxView: View {
                 }
             }
             
-            // HOME
+            // HOME BUTTON
             Button(action: {
                 dismiss()
             }) {
@@ -102,7 +101,7 @@ struct ShelfBoxView: View {
                     .foregroundColor(.black)
             }
             .frame(width: 160, height: 151)
-            .background(Color(hexString: "FBDC7E"))
+            .background(Color(red: 0.984, green: 0.863, blue: 0.494))
             .clipShape(Circle())
             .position(x: 100, y: 900)
         }
@@ -110,38 +109,53 @@ struct ShelfBoxView: View {
     }
     
     
-    // MARK: - Shelf Drop
+    // MARK: - Shelf Drop (الدروب فوق الرف فقط + أكثر من عنصر)
     
     func shelfDrop(index: Int, x: CGFloat, y: CGFloat) -> some View {
-        ZStack {
+        ZStack(alignment: .topLeading) {
+            
             Image("shelf1")
                 .resizable()
                 .frame(width: 572, height: 78)
             
-            if let item = viewModel.shelves[index] {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(randomColor(for: item))
-                    .frame(width: 60, height: 60)
+            HStack(spacing: 10) {
+                ForEach(viewModel.currentShelves[index]) { item in
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(randomColor(for: item))
+                        .frame(width: 45, height: 45)
+                }
             }
+            .padding(.leading, 20)
+            .padding(.top, -22) // 🔥 يخليها على أعلى حد الرف
+            
         }
         .position(x: x, y: y)
-        .onDrop(of: [UTType.text], isTargeted: nil) { providers in
-            
-            if let provider = providers.first {
-                provider.loadObject(ofClass: NSString.self) { object, _ in
-                    if let nsString = object as? NSString {
-                        let idString = String(nsString)
-                        if let item = viewModel.inboxItems.first(where: { $0.id.uuidString == idString }) {
-                            DispatchQueue.main.async {
-                                viewModel.placeItem(item, at: index)
+        .overlay(
+            Rectangle()
+                .fill(Color.clear)
+                .frame(width: 572, height: 30) // 🔥 منطقة الدروب أعلى الرف فقط
+                .offset(y: -25)
+                .onDrop(of: [UTType.text], isTargeted: nil) { providers in
+                    
+                    if let provider = providers.first {
+                        provider.loadObject(ofClass: NSString.self) { object, _ in
+                            if let nsString = object as? NSString {
+                                let idString = String(nsString)
+                                
+                                if let item = viewModel.inboxItems.first(where: {
+                                    $0.id.uuidString == idString
+                                }) {
+                                    DispatchQueue.main.async {
+                                        viewModel.placeItem(item, at: index)
+                                    }
+                                }
                             }
                         }
                     }
+                    
+                    return true
                 }
-            }
-            
-            return true
-        }
+        )
     }
     
     
@@ -158,29 +172,3 @@ struct ShelfBoxView: View {
 #Preview {
     ShelfBoxView()
 }
-
-// MARK: - Color + Hex Support
-private extension Color {
-    init?(hexString: String) {
-        // Remove leading '#' if present and ensure 6 or 8 hex chars
-        var hex = hexString.trimmingCharacters(in: .whitespacesAndNewlines)
-        if hex.hasPrefix("#") { hex.removeFirst() }
-        guard hex.count == 6 || hex.count == 8, let intVal = UInt64(hex, radix: 16) else {
-            return nil
-        }
-        let a, r, g, b: Double
-        if hex.count == 8 {
-            a = Double((intVal & 0xFF00_0000) >> 24) / 255.0
-            r = Double((intVal & 0x00FF_0000) >> 16) / 255.0
-            g = Double((intVal & 0x0000_FF00) >> 8) / 255.0
-            b = Double(intVal & 0x0000_00FF) / 255.0
-        } else {
-            a = 1.0
-            r = Double((intVal & 0xFF00_00) >> 16) / 255.0
-            g = Double((intVal & 0x00FF_00) >> 8) / 255.0
-            b = Double(intVal & 0x0000_FF) / 255.0
-        }
-        self = Color(red: r, green: g, blue: b, opacity: a)
-    }
-}
-
