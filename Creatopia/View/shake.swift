@@ -54,6 +54,7 @@ private let footerSize: CGFloat = 28
             BigSurprisesOverlay(show: didShake)
                 .allowsHitTesting(false)
         }
+        .navigationBarBackButtonHidden(true)
         .modifier(ShakeDetector {
             withAnimation(.spring(response: 0.45, dampingFraction: 0.75)) {
                 didShake = true

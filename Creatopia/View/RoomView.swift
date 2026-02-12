@@ -26,11 +26,24 @@ struct RoomView: View {
 
     @State private var instructionIndex = 0
     @State private var showInstructions = true
+    @State private var showHome = false
 
     var body: some View {
         ZStack {
+            if showHome {
+                HomeView()
+                    .transition(.opacity)
+            } else {
+                roomContent
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.4), value: showHome)
+    }
 
-            // Background image
+    var roomContent: some View {
+        ZStack {
+
             Image("room")
                 .resizable()
                 .scaledToFill()
@@ -52,18 +65,21 @@ struct RoomView: View {
 
                     Text(currentItem.instruction)
                         .font(.system(size: 20, weight: .semibold))
-                    
                         .foregroundColor(.black)
                         .multilineTextAlignment(.leading)
 
-                    Button(action: {
+                    Button {
                         let key = "seen_\(currentItem.name)"
                         UserDefaults.standard.set(true, forKey: key)
+
                         instructionIndex += 1
+
                         if instructionIndex >= gameItems.count {
                             showInstructions = false
+                            showHome = true
                         }
-                    }) {
+
+                    } label: {
                         Image(systemName: "arrow.right.circle.fill")
                             .resizable()
                             .frame(width: 40, height: 40)
@@ -74,13 +90,15 @@ struct RoomView: View {
                 .background(Color.white)
                 .cornerRadius(15)
                 .shadow(radius: 5)
-                .position(x: currentItem.position.x,
-                          y: currentItem.position.y - currentItem.size.height/2 - 60)
+                .position(
+                    x: currentItem.position.x,
+                    y: currentItem.position.y - currentItem.size.height/2 - 60
+                )
             }
         }
-        .navigationBarTitle("HomeView", displayMode: .inline)
     }
 }
+
 #Preview {
     RoomView()
 }

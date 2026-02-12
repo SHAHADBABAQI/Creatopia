@@ -15,18 +15,19 @@ struct DIYtimer: View {
     @State private var showConfetti = false
     @State private var timerFinished = false
     @State private var isRunning = true
-    @State private var timeConsumed: Int = 0 // in seconds
-    @State private var goHome: Bool = false  // programmatic navigation flag
+    @State private var timeConsumed: Int = 0
+    @State private var goHome: Bool = false
+
+    @State private var showCamera = false
+    @State private var capturedImage: UIImage?   // Restored to keep the photo
 
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var finishedMessage: String {
         if timeConsumed < 60 {
-            // Show seconds if less than a minute
             let seconds = max(0, timeConsumed)
             return "you finished crafting in \(seconds) second\(seconds == 1 ? "" : "s"), yay!"
         } else {
-            // Show whole minutes (floor)
             let minutes = max(1, timeConsumed / 60)
             return "you finished crafting in \(minutes) minute\(minutes == 1 ? "" : "s"), yay!"
         }
@@ -44,7 +45,6 @@ struct DIYtimer: View {
                     .frame(width: 880, height: 600)
                     .overlay(
                         VStack(spacing: 60) {
-                            // Title switches when the timer finishes
                             Text(timerFinished ? "WELL DONE!" : "GO GO GO!")
                                 .font(.system(size: 90, weight: .bold))
                                 .foregroundColor(.white)
@@ -55,7 +55,6 @@ struct DIYtimer: View {
                                     }
                                 }
 
-                            // Subtitle while running vs finished
                             if !timerFinished {
                                 Text("Let’s make something amazing in the next \(DIYtimer.duration / 60) minutes")
                                     .font(.system(size: 36, weight: .medium))
@@ -68,19 +67,15 @@ struct DIYtimer: View {
                                     .transition(.opacity)
                             }
 
-                            // Show countdown only while not finished
                             if !timerFinished {
                                 Text(timeString(from: timeRemaining))
                                     .font(.system(size: 60, weight: .semibold))
                                     .foregroundColor(.white)
                             }
 
-                            // Controls visible during countdown
                             if !timerFinished {
                                 VStack(spacing: 90) {
-                                    // Top row: Restart + Pause/Play
                                     HStack(spacing: 250) {
-                                        // Pause/Play Button
                                         if timeRemaining > 0 {
                                             Button(action: {
                                                 isRunning.toggle()
@@ -99,9 +94,8 @@ struct DIYtimer: View {
                                                 .opacity(0.8)
                                             }
                                         }
-                                        // "I finished" Button
+
                                         Button(action: {
-                                            // Immediately transition to finished state
                                             isRunning = false
                                             timeConsumed = DIYtimer.duration - timeRemaining
                                             timerFinished = true
@@ -141,7 +135,6 @@ struct DIYtimer: View {
                                             .opacity(0.8)
                                         }
                                     }
-
                                 }
                                 .padding(.top, 20)
                                 .padding(.bottom, 40)
@@ -154,7 +147,7 @@ struct DIYtimer: View {
                                 if timeRemaining == 0 {
                                     timerFinished = true
                                     showConfetti = true
-                                    timeConsumed = DIYtimer.duration // consumed entire duration
+                                    timeConsumed = DIYtimer.duration
                                 }
                             }
                         }
@@ -163,7 +156,6 @@ struct DIYtimer: View {
                     .overlay(alignment: .bottomLeading) {
                         if timerFinished {
                             ZStack {
-                                // Hidden navigation trigger
                                 NavigationLink(isActive: $goHome) {
                                     HomeView()
                                 } label: {
@@ -171,9 +163,7 @@ struct DIYtimer: View {
                                 }
                                 .hidden()
 
-                                // Clickable button
                                 Button(action: {
-                                    // Any logic before navigating can go here
                                     goHome = true
                                 }) {
                                     ZStack {
@@ -192,9 +182,7 @@ struct DIYtimer: View {
                     }
                     .overlay(alignment: .bottomTrailing) {
                         if timerFinished {
-                            Button(action: {
-                                // Camera action
-                            }) {
+                            Button(action: { showCamera = true }) {
                                 ZStack {
                                     Circle()
                                         .fill(Color.ButtonYellow)
@@ -215,9 +203,14 @@ struct DIYtimer: View {
                 }
             }
         }
+        .sheet(isPresented: $showCamera) {
+            CameraView { image in
+                capturedImage = image   // keep the captured photo
+                // You can add saving logic here later
+            }
+        }
     }
 
-    // Formats seconds as HH:MM:SS
     private func timeString(from totalSeconds: Int) -> String {
         let hour = totalSeconds / 3600
         let minutes = (totalSeconds % 3600) / 60
