@@ -6,13 +6,13 @@
 import SwiftUI
 import UIKit
 
-struct shake: View {
+struct Shake: View {
 
-    private let titleSize: CGFloat = 60
-    private let subtitleSize: CGFloat = 30
-    private let footerSize: CGFloat = 28
 
-    @State private var didShake = false
+private let titleSize: CGFloat = 60
+private let subtitleSize: CGFloat = 30
+private let footerSize: CGFloat = 28
+@State private var didShake = false
 
     var body: some View {
         ZStack {
@@ -24,7 +24,7 @@ struct shake: View {
             BubbleOverlay()
 
             ZStack {
-                MiniIPadRealCard(shakeNow: didShake)
+                MiniIPadRealCard()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .offset(y: 80)
@@ -55,24 +55,37 @@ struct shake: View {
                 .allowsHitTesting(false)
         }
         .modifier(ShakeDetector {
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.60)) {
+            withAnimation(.spring(response: 0.45, dampingFraction: 0.75)) {
                 didShake = true
             }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                withAnimation(.easeOut(duration: 0.2)) {
-                    didShake = false
-                }
-            }
         })
+        
+        .overlay(
+            Button(action: {
+                print("Yellow button tapped")
+            }) {
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(.black)
+                    .frame(width: 70, height: 80)
+                    .background(Color.ButtonYellow)
+                    .clipShape(Circle())
+                    .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 6)
+            }
+            .padding(.trailing, 90)
+            .padding(.bottom, 90),
+            alignment: .bottomTrailing
+        )
+
     }
+    
+}
+
+#Preview(traits: .landscapeLeft) {
+    ContentView()
 }
 
 struct MiniIPadRealCard: View {
-
-    let shakeNow: Bool
-    @State private var wiggle = false
-
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
@@ -83,7 +96,7 @@ struct MiniIPadRealCard: View {
                         .stroke(Color.black.opacity(0.9), lineWidth: 8)
                 )
                 .shadow(color: .black.opacity(0.25), radius: 18, x: 0, y: 12)
-                .rotationEffect(.degrees(wiggle ? -14 : -10))
+                .rotationEffect(.degrees(-10))
 
             ZStack {
                 Text("SHAKE")
@@ -106,17 +119,6 @@ struct MiniIPadRealCard: View {
             }
             .rotationEffect(.degrees(-30))
         }
-        .onChange(of: shakeNow) { _, newValue in
-            guard newValue else { return }
-
-            withAnimation(.easeInOut(duration: 0.10).repeatCount(6, autoreverses: true)) {
-                wiggle.toggle()
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-                wiggle = false
-            }
-        }
     }
 }
 
@@ -127,6 +129,7 @@ struct ShakeHintArrows: View {
 
     var body: some View {
         ZStack {
+
             LCornerStack()
                 .offset(x: 240, y: -95)
 
@@ -208,6 +211,7 @@ struct BigToolBall: View {
     }
 }
 
+// MARK: - Bubble Overlay
 struct BubbleOverlay: View {
 
     struct BubbleItem: Identifiable {
@@ -226,19 +230,19 @@ struct BubbleOverlay: View {
         .init(image: "tape",     size: 85,  x: 0.38, y: 0.68),
         .init(image: "scissors", size: 120, x: 0.55, y: 0.36),
         .init(image: "brush",    size: 90,  x: 0.92, y: 0.58),
-//
-//        .init(image: "pencil",   size: 60,  x: 0.08, y: 0.18),
-//        .init(image: "glue",     size: 65,  x: 0.62, y: 0.18),
-//        .init(image: "tape",     size: 75,  x: 0.90, y: 0.75),
-//        .init(image: "eraser",   size: 55,  x: 0.25, y: 0.82),
-//        .init(image: "ruler",    size: 70,  x: 0.70, y: 0.84),
-//
-//        .init(image: "glue",     size: 95,  x: 0.10, y: 0.88),
-//        .init(image: "tape",     size: 110, x: 0.22, y: 0.92),
-//        .init(image: "pencil",   size: 130, x: 0.40, y: 0.90),
-//        .init(image: "eraser",   size: 100, x: 0.62, y: 0.94),
-//        .init(image: "ruler",    size: 115, x: 0.80, y: 0.90),
-//        .init(image: "scissors", size: 135, x: 0.94, y: 0.92)
+
+        .init(image: "pencil",   size: 60,  x: 0.08, y: 0.18),
+        .init(image: "glue",     size: 65,  x: 0.62, y: 0.18),
+        .init(image: "tape",     size: 75,  x: 0.90, y: 0.75),
+        .init(image: "eraser",   size: 55,  x: 0.25, y: 0.82),
+        .init(image: "ruler",    size: 70,  x: 0.70, y: 0.84),
+
+        .init(image: "glue",     size: 95,  x: 0.10, y: 0.88),
+        .init(image: "tape",     size: 110, x: 0.22, y: 0.92),
+        .init(image: "pencil",   size: 130, x: 0.40, y: 0.90),
+        .init(image: "eraser",   size: 100, x: 0.62, y: 0.94),
+        .init(image: "ruler",    size: 115, x: 0.80, y: 0.90),
+        .init(image: "scissors", size: 135, x: 0.94, y: 0.92)
     ]
 
     var body: some View {
@@ -349,6 +353,9 @@ final class ShakeUIView: UIView {
     }
 }
 
+
+
+
 #Preview {
-    shake()
+    Shake()
 }
