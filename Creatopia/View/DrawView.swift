@@ -211,11 +211,16 @@
                                             }
                                         }
                                         .sheet(isPresented: $showCamera) {
-                                                    CameraView { image in
-                                                        capturedImage = image   // store image here
-                                                        // Later: save to SwiftData
-                                                    }
+                                            CameraView(
+                                                onImagePicked: { _ in
+                                                    // You can store/show original image if needed
+                                                },
+                                                onProcessedImage: { image in
+                                                    capturedImage = image   // store processed image here
+                                                    // Later: save to SwiftData if desired
                                                 }
+                                            )
+                                        }
                                     }
                                     .padding(.horizontal, 24)
                                     .padding(.bottom, 20) // 👈 CONTROL THIS VALUE
@@ -296,4 +301,3 @@
     #Preview {
         drawView()
     }
-

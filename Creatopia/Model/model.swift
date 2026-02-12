@@ -6,19 +6,20 @@
 //
 import SwiftUI
 import SwiftData
-//need init
+
 @Model
 class MasterPiece: Identifiable {
-    //var id:UUID
-    @Attribute(.unique) var id: UUID
-    var date: Date
+    @Attribute(.unique) var id: UUID = UUID()
+    var date: Date = Date()
     var imageData: Data
-    //i have to intilise all data i can not init some of data
-    init( date: Date, imageData: Data) {
+
+    init(imageData: Data) {
+        self.imageData = imageData
+    }
+
+    init(date: Date, imageData: Data) {
         self.id = UUID()
         self.date = date
         self.imageData = imageData
     }
-    
-    
-}//class
+}

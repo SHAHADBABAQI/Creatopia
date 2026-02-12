@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct CreatopiaApp: App {
@@ -13,5 +14,6 @@ struct CreatopiaApp: App {
         WindowGroup {
             start()
         }
+        .modelContainer(for: MasterPiece.self)
     }
 }
