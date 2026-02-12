@@ -220,13 +220,13 @@ struct BubbleOverlay: View {
     }
 
     private let bubbles: [BubbleItem] = [
-        .init(image: "pencil",   size: 70,  x: 0.18, y: 0.22),
-        .init(image: "ruler",    size: 110, x: 0.86, y: 0.20),
-        .init(image: "glue",     size: 80,  x: 0.78, y: 0.42),
-        .init(image: "eraser",   size: 95,  x: 0.16, y: 0.52),
-        .init(image: "tape",     size: 85,  x: 0.38, y: 0.68),
-        .init(image: "scissors", size: 120, x: 0.55, y: 0.36),
-        .init(image: "brush",    size: 90,  x: 0.92, y: 0.58),
+//        .init(image: "pencil",   size: 70,  x: 0.18, y: 0.22),
+//        .init(image: "ruler",    size: 110, x: 0.86, y: 0.20),
+//        .init(image: "glue",     size: 80,  x: 0.78, y: 0.42),
+//        .init(image: "eraser",   size: 95,  x: 0.16, y: 0.52),
+//        .init(image: "tape",     size: 85,  x: 0.38, y: 0.68),
+//        .init(image: "scissors", size: 120, x: 0.55, y: 0.36),
+//        .init(image: "brush",    size: 90,  x: 0.92, y: 0.58),
 //
 //        .init(image: "pencil",   size: 60,  x: 0.08, y: 0.18),
 //        .init(image: "glue",     size: 65,  x: 0.62, y: 0.18),

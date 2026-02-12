@@ -204,10 +204,15 @@ struct DIYtimer: View {
             }
         }
         .sheet(isPresented: $showCamera) {
-            CameraView { image in
-                capturedImage = image   // keep the captured photo
-                // You can add saving logic here later
-            }
+            CameraView(
+                onImagePicked: { _ in
+                    // optionally handle the original image if you want
+                },
+                onProcessedImage: { image in
+                    capturedImage = image   // keep the processed photo
+                    // You can add saving logic here later
+                }
+            )
         }
     }
 
