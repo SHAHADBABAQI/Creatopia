@@ -224,26 +224,26 @@ struct BubbleOverlay: View {
     }
 
     private let bubbles: [BubbleItem] = [
-        .init(image: "pencil",   size: 70,  x: 0.18, y: 0.22),
-        .init(image: "ruler",    size: 110, x: 0.86, y: 0.20),
-        .init(image: "glue",     size: 80,  x: 0.78, y: 0.42),
-        .init(image: "eraser",   size: 95,  x: 0.16, y: 0.52),
-        .init(image: "tape",     size: 85,  x: 0.38, y: 0.68),
-        .init(image: "scissors", size: 120, x: 0.55, y: 0.36),
-        .init(image: "brush",    size: 90,  x: 0.92, y: 0.58),
-
-        .init(image: "pencil",   size: 60,  x: 0.08, y: 0.18),
-        .init(image: "glue",     size: 65,  x: 0.62, y: 0.18),
-        .init(image: "tape",     size: 75,  x: 0.90, y: 0.75),
-        .init(image: "eraser",   size: 55,  x: 0.25, y: 0.82),
-        .init(image: "ruler",    size: 70,  x: 0.70, y: 0.84),
-
-        .init(image: "glue",     size: 95,  x: 0.10, y: 0.88),
-        .init(image: "tape",     size: 110, x: 0.22, y: 0.92),
-        .init(image: "pencil",   size: 130, x: 0.40, y: 0.90),
-        .init(image: "eraser",   size: 100, x: 0.62, y: 0.94),
-        .init(image: "ruler",    size: 115, x: 0.80, y: 0.90),
-        .init(image: "scissors", size: 135, x: 0.94, y: 0.92)
+//        .init(image: "pencil",   size: 70,  x: 0.18, y: 0.22),
+//        .init(image: "ruler",    size: 110, x: 0.86, y: 0.20),
+//        .init(image: "glue",     size: 80,  x: 0.78, y: 0.42),
+//        .init(image: "eraser",   size: 95,  x: 0.16, y: 0.52),
+//        .init(image: "tape",     size: 85,  x: 0.38, y: 0.68),
+//        .init(image: "scissors", size: 120, x: 0.55, y: 0.36),
+//        .init(image: "brush",    size: 90,  x: 0.92, y: 0.58),
+//
+//        .init(image: "pencil",   size: 60,  x: 0.08, y: 0.18),
+//        .init(image: "glue",     size: 65,  x: 0.62, y: 0.18),
+//        .init(image: "tape",     size: 75,  x: 0.90, y: 0.75),
+//        .init(image: "eraser",   size: 55,  x: 0.25, y: 0.82),
+//        .init(image: "ruler",    size: 70,  x: 0.70, y: 0.84),
+//
+//        .init(image: "glue",     size: 95,  x: 0.10, y: 0.88),
+//        .init(image: "tape",     size: 110, x: 0.22, y: 0.92),
+//        .init(image: "pencil",   size: 130, x: 0.40, y: 0.90),
+//        .init(image: "eraser",   size: 100, x: 0.62, y: 0.94),
+//        .init(image: "ruler",    size: 115, x: 0.80, y: 0.90),
+//        .init(image: "scissors", size: 135, x: 0.94, y: 0.92)
     ]
 
     var body: some View {
