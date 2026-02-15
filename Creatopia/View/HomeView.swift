@@ -68,7 +68,7 @@ struct HomeView: View {
                 // table
                 NavigationLink {
                     // Destination when tapping the table
-                    DIYtimer()
+                    Shake()
                         .onAppear {
                             // Restart the wobble animation on navigation if desired
                             moveTable = false

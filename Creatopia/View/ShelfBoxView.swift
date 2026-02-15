@@ -6,6 +6,7 @@ struct ShelfBoxView: View {
     @Query(sort: \MasterPiece.date, order: .forward) var photos: [MasterPiece]
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = ShelfBoxViewModel()
+    @State private var isProcessing = false
     
     var body: some View {
         ZStack {
@@ -120,7 +121,7 @@ struct ShelfBoxView: View {
                             .foregroundColor(.white)
                     }
                     .padding(40)
-                    .background(Color(hexString: "FBDC7E"))
+                    .background(Color("FBDC7E"))
                     .cornerRadius(20)
                 }
             }
