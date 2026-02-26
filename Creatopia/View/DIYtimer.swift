@@ -2,13 +2,14 @@
 //  DIYtimer.swift
 //  Creatopia
 //
-//  Created by Sarah Khalid Almalki on 20/08/1447 AH.
-//
 
 import SwiftUI
 import Combine
+import SwiftData
 
 struct DIYtimer: View {
+    @Environment(\.modelContext) private var modelContext
+
     @State private var animate: Bool = false
     static let duration = 900
     @State private var timeRemaining = DIYtimer.duration
@@ -16,10 +17,8 @@ struct DIYtimer: View {
     @State private var timerFinished = false
     @State private var isRunning = true
     @State private var timeConsumed: Int = 0
-    @State private var goHome: Bool = false
-
+    @State private var navigateToShelfBox = false
     @State private var showCamera = false
-    @State private var capturedImage: UIImage?   // Restored to keep the photo
 
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -34,98 +33,58 @@ struct DIYtimer: View {
     }
 
     var body: some View {
-        ZStack {
-            Image("timerBackground")
-                .resizable()
-                .frame(width: 1370, height: 1037)
-
+        NavigationStack {
             ZStack {
-                RoundedRectangle(cornerRadius: 26)
-                    .fill(Color.panelPink)
-                    .frame(width: 880, height: 600)
-                    .overlay(
-                        VStack(spacing: 60) {
-                            Text(timerFinished ? "WELL DONE!" : "GO GO GO!")
-                                .font(.system(size: 90, weight: .bold))
-                                .foregroundColor(.white)
-                                .scaleEffect(animate ? 1.3 : 1.0)
-                                .onAppear {
-                                    withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                                        animate.toggle()
-                                    }
+                Image("timerBackground")
+                    .resizable()
+                    .frame(width: 1370, height: 1037)
+
+                ZStack {
+                    // ── Pink box ──
+                    RoundedRectangle(cornerRadius: 26)
+                        .fill(Color.panelPink)
+                        .frame(width: 880, height: 600)
+
+                    VStack(spacing: 60) {
+
+                        Text(timerFinished ? "WELL DONE!" : "GO GO GO!")
+                            .font(.system(size: 90, weight: .bold))
+                            .foregroundColor(.white)
+                            .scaleEffect(animate ? 1.3 : 1.0)
+                            .onAppear {
+                                withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                                    animate.toggle()
                                 }
-
-                            if !timerFinished {
-                                Text("Let’s make something amazing in the next \(DIYtimer.duration / 60) minutes")
-                                    .font(.system(size: 36, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.95))
-                                    .transition(.opacity)
-                            } else {
-                                Text(finishedMessage)
-                                    .font(.system(size: 36, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.95))
-                                    .transition(.opacity)
                             }
 
-                            if !timerFinished {
-                                Text(timeString(from: timeRemaining))
-                                    .font(.system(size: 60, weight: .semibold))
-                                    .foregroundColor(.white)
-                            }
+                        if !timerFinished {
+                            Text("Let's make something amazing in the next \(DIYtimer.duration / 60) minutes")
+                                .font(.system(size: 36, weight: .medium))
+                                .foregroundColor(.white.opacity(0.95))
+                                .transition(.opacity)
+                        } else {
+                            Text(finishedMessage)
+                                .font(.system(size: 36, weight: .medium))
+                                .foregroundColor(.white.opacity(0.95))
+                                .transition(.opacity)
+                        }
 
-                            if !timerFinished {
-                                VStack(spacing: 90) {
-                                    HStack(spacing: 250) {
-                                        if timeRemaining > 0 {
-                                            Button(action: {
-                                                isRunning.toggle()
-                                            }) {
-                                                ZStack {
-                                                    Circle()
-                                                        .fill(Color.ButtonYellow)
-                                                        .frame(width: 100, height: 100)
-                                                    Image(systemName: isRunning ? "pause.fill" : "play.fill")
-                                                        .resizable()
-                                                        .bold()
-                                                        .scaledToFit()
-                                                        .frame(width: 50, height: 50)
-                                                        .foregroundColor(.black)
-                                                }
-                                                .opacity(0.8)
-                                            }
-                                        }
+                        if !timerFinished {
+                            Text(timeString(from: timeRemaining))
+                                .font(.system(size: 60, weight: .semibold))
+                                .foregroundColor(.white)
+                        }
 
-                                        Button(action: {
-                                            isRunning = false
-                                            timeConsumed = DIYtimer.duration - timeRemaining
-                                            timerFinished = true
-                                            showConfetti = true
-                                        }) {
+                        if !timerFinished {
+                            VStack(spacing: 90) {
+                                HStack(spacing: 250) {
+                                    if timeRemaining > 0 {
+                                        Button(action: { isRunning.toggle() }) {
                                             ZStack {
                                                 Circle()
                                                     .fill(Color.ButtonYellow)
                                                     .frame(width: 100, height: 100)
-                                                Image(systemName: "checkmark")
-                                                    .resizable()
-                                                    .bold()
-                                                    .scaledToFit()
-                                                    .frame(width: 50, height: 50)
-                                                    .foregroundColor(.black)
-                                            }
-                                        }
-                                    
-                                        Button(action: {
-                                            timeRemaining = DIYtimer.duration
-                                            timerFinished = false
-                                            showConfetti = false
-                                            isRunning = true
-                                            timeConsumed = 0
-                                        }) {
-                                            ZStack {
-                                                Circle()
-                                                    .fill(Color.ButtonYellow)
-                                                    .frame(width: 100, height: 100)
-                                                Image(systemName: "arrow.clockwise")
+                                                Image(systemName: isRunning ? "pause.fill" : "play.fill")
                                                     .resizable()
                                                     .bold()
                                                     .scaledToFit()
@@ -135,84 +94,133 @@ struct DIYtimer: View {
                                             .opacity(0.8)
                                         }
                                     }
-                                }
-                                .padding(.top, 20)
-                                .padding(.bottom, 40)
-                            }
-                        }
-                        .onReceive(timer) { _ in
-                            guard isRunning else { return }
-                            if timeRemaining > 0 {
-                                timeRemaining -= 1
-                                if timeRemaining == 0 {
-                                    timerFinished = true
-                                    showConfetti = true
-                                    timeConsumed = DIYtimer.duration
-                                }
-                            }
-                        }
-                    )
 
-                    .overlay(alignment: .bottomLeading) {
-                        if timerFinished {
-                            ZStack {
-                                NavigationLink(isActive: $goHome) {
-                                    HomeView()
-                                } label: {
-                                    EmptyView()
-                                }
-                                .hidden()
+                                    Button(action: {
+                                        isRunning = false
+                                        timeConsumed = DIYtimer.duration - timeRemaining
+                                        timerFinished = true
+                                        showConfetti = true
+                                    }) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.ButtonYellow)
+                                                .frame(width: 100, height: 100)
+                                            Image(systemName: "checkmark")
+                                                .resizable()
+                                                .bold()
+                                                .scaledToFit()
+                                                .frame(width: 50, height: 50)
+                                                .foregroundColor(.black)
+                                        }
+                                    }
 
-                                Button(action: {
-                                    goHome = true
-                                }) {
-                                    ZStack {
-                                        Circle()
-                                            .fill(Color.ButtonYellow)
-                                            .frame(width: 100, height: 100)
-                                        Image(systemName: "house.fill")
-                                            .resizable()
-                                            .frame(width: 80, height: 70)
-                                            .foregroundColor(Color.black)
+                                    Button(action: {
+                                        timeRemaining = DIYtimer.duration
+                                        timerFinished = false
+                                        showConfetti = false
+                                        isRunning = true
+                                        timeConsumed = 0
+                                    }) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.ButtonYellow)
+                                                .frame(width: 100, height: 100)
+                                            Image(systemName: "arrow.clockwise")
+                                                .resizable()
+                                                .bold()
+                                                .scaledToFit()
+                                                .frame(width: 50, height: 50)
+                                                .foregroundColor(.black)
+                                        }
+                                        .opacity(0.8)
                                     }
                                 }
                             }
-                            .padding(24)
+                            .padding(.top, 20)
+                            .padding(.bottom, -40)
                         }
                     }
-                    .overlay(alignment: .bottomTrailing) {
-                        if timerFinished {
-                            Button(action: { showCamera = true }) {
-                                ZStack {
-                                    Circle()
-                                        .fill(Color.ButtonYellow)
-                                        .frame(width: 100, height: 100)
-                                    Image(systemName: "camera.fill")
-                                        .resizable()
-                                        .frame(width: 60, height: 60)
-                                        .foregroundColor(Color.black)
-                                }
+                    .onReceive(timer) { _ in
+                        guard isRunning else { return }
+                        if timeRemaining > 0 {
+                            timeRemaining -= 1
+                            if timeRemaining == 0 {
+                                timerFinished = true
+                                showConfetti = true
+                                timeConsumed = DIYtimer.duration
                             }
-                            .padding(24)
                         }
                     }
-                    .frame(width: 760, height: 510)
 
-                if showConfetti {
-                    ConfettiView()
+                    // ── Finished: Home + Camera buttons inside the pink box ──
+                    if timerFinished {
+                        ZStack {
+                            NavigationLink(destination: ShelfBoxView(), isActive: $navigateToShelfBox) {
+                                EmptyView()
+                            }
+                            .hidden()
+
+                            VStack {
+                                Spacer()
+                                HStack {
+                                    NavigationLink(destination: HomeView()) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.ButtonYellow)
+                                                .frame(width: 100, height: 100)
+                                            Image(systemName: "house.fill")
+                                                .resizable()
+                                                .frame(width: 80, height: 70)
+                                                .foregroundColor(.black)
+                                        }
+                                    }
+
+                                    Spacer()
+
+                                    Button(action: { showCamera = true }) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.ButtonYellow)
+                                                .frame(width: 100, height: 100)
+                                            Image(systemName: "camera.fill")
+                                                .resizable()
+                                                .frame(width: 60, height: 60)
+                                                .foregroundColor(.black)
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal, 24)
+                                .padding(.bottom, 20)
+                            }
+                        }
+                        .frame(width: 880, height: 600) // ← matches pink box size
+                    }
+
+                    if showConfetti {
+                        ConfettiView()
+                    }
                 }
             }
-        }
-        .sheet(isPresented: $showCamera) {
-            CameraView(
-                onImagePicked: { _ in
-                    // optionally handle the original image if you want
-                },
-                onProcessedImage: { image in
-                    capturedImage = image   // keep the processed photo
-                    // You can add saving logic here later
-                }
-            )
+            // ── Single sheet with background remover ──
+            .sheet(isPresented: $showCamera) {
+                CameraView(
+                    onImagePicked: { _ in },
+                    onProcessedImage: { processedImage in
+                        // Save background-removed photo to SwiftData
+                        if let data = processedImage.pngData() {
+                            let newPhoto = MasterPiece(imageData: data)
+                            modelContext.insert(newPhoto)
+                            try? modelContext.save()
+                            print("✅ Background-removed photo saved!")
+                        }
+                        showCamera = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            navigateToShelfBox = true
+                        }
+                    }
+                )
+            }
+            .navigationBarBackButtonHidden(true)
         }
     }
 
@@ -225,7 +233,6 @@ struct DIYtimer: View {
 
     struct ConfettiView: View {
         let colors: [Color] = [.red, .purple, .yellow, .green, .orange, .pink, .white, .mint]
-
         var body: some View {
             GeometryReader { geo in
                 ForEach(0..<500, id: \.self) { _ in
@@ -246,10 +253,8 @@ struct DIYtimer: View {
         let x: CGFloat
         let delay: Double
         let availableHeight: CGFloat
-
         @State private var y: CGFloat = -20
         @State private var rotation: Double = 0
-
         var body: some View {
             Rectangle()
                 .fill(color)
@@ -257,10 +262,7 @@ struct DIYtimer: View {
                 .rotationEffect(.degrees(rotation))
                 .position(x: x, y: y)
                 .onAppear {
-                    withAnimation(
-                        .easeIn(duration: 2.5)
-                            .delay(delay)
-                    ) {
+                    withAnimation(.easeIn(duration: 2.5).delay(delay)) {
                         y = availableHeight + 20
                         rotation = Double.random(in: 0...360)
                     }
@@ -270,7 +272,5 @@ struct DIYtimer: View {
 }
 
 #Preview {
-    NavigationStack {
-        DIYtimer()
-    }
+    NavigationStack { DIYtimer() }
 }
