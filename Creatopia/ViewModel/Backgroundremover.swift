@@ -1,10 +1,3 @@
-//
-//  Backgroundremover.swift
-//  Creatopia
-//
-//  Created by shahad khaled on 24/08/1447 AH.
-//
-
 import Vision
 import CoreImage
 import UIKit
@@ -17,7 +10,6 @@ class BackgroundRemover {
             return
         }
         
-        // Create the Vision request
         let request = VNGenerateForegroundInstanceMaskRequest { request, error in
             if let error = error {
                 print("Vision Error: \(error.localizedDescription)")
@@ -31,12 +23,10 @@ class BackgroundRemover {
                 return
             }
             
-            // Process the mask to remove background
-            let maskedImage = self.applyMask(result, to: cgImage)
+            let maskedImage = self.applyMask(result, to: cgImage, originalImage: image)
             completion(maskedImage)
         }
         
-        // Execute the request
         let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
         DispatchQueue.global(qos: .userInitiated).async {
             do {
@@ -48,32 +38,66 @@ class BackgroundRemover {
         }
     }
     
-    private func applyMask(_ mask: VNInstanceMaskObservation, to image: CGImage) -> UIImage? {
-        // Convert mask to CIImage
-        guard let maskImage = try? mask.generateMaskedImage(
+    private func applyMask(_ mask: VNInstanceMaskObservation, to cgImage: CGImage, originalImage: UIImage) -> UIImage? {
+        let originalWidth = cgImage.width
+        let originalHeight = cgImage.height
+        
+        // Generate the mask pixel buffer
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        guard let maskPixelBuffer = try? mask.generateMaskedImage(
             ofInstances: mask.allInstances,
-            from: VNImageRequestHandler(cgImage: image),
-            croppedToInstancesExtent: false
+            from: handler,
+            croppedToInstancesExtent: false  // Keep full original size
         ) else {
             return nil
         }
         
-        let ciImage = CIImage(cgImage: image)
-        let ciMask = CIImage(cvPixelBuffer: maskImage)
+        // Convert original image and mask to CIImage
+        let ciOriginal = CIImage(cgImage: cgImage)
+        var ciMask = CIImage(cvPixelBuffer: maskPixelBuffer)
         
-        // Apply the mask using Core Image
-        let filter = CIFilter(name: "CIBlendWithMask")
-        filter?.setValue(ciImage, forKey: kCIInputImageKey)
-        filter?.setValue(ciMask, forKey: kCIInputMaskImageKey)
-        filter?.setValue(CIImage.empty(), forKey: kCIInputBackgroundImageKey)
+        // Scale mask to match original image dimensions if needed
+        let maskWidth = CGFloat(CVPixelBufferGetWidth(maskPixelBuffer))
+        let maskHeight = CGFloat(CVPixelBufferGetHeight(maskPixelBuffer))
+        let scaleX = CGFloat(originalWidth) / maskWidth
+        let scaleY = CGFloat(originalHeight) / maskHeight
         
-        guard let output = filter?.outputImage else { return nil }
+        if abs(scaleX - 1.0) > 0.01 || abs(scaleY - 1.0) > 0.01 {
+            ciMask = ciMask.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+        }
         
-        let context = CIContext()
-        guard let cgOutput = context.createCGImage(output, from: output.extent) else {
+        // Blend: keeps foreground, removes background (transparent)
+        guard let blendFilter = CIFilter(name: "CIBlendWithMask") else { return nil }
+        blendFilter.setValue(ciOriginal, forKey: kCIInputImageKey)
+        blendFilter.setValue(ciMask, forKey: kCIInputMaskImageKey)
+        blendFilter.setValue(CIImage.empty(), forKey: kCIInputBackgroundImageKey)
+        
+        guard let outputCI = blendFilter.outputImage else { return nil }
+        
+        let context = CIContext(options: [.workingColorSpace: CGColorSpaceCreateDeviceRGB()])
+        
+        // Render at the original image's full extent/size
+        let renderRect = CGRect(x: 0, y: 0, width: originalWidth, height: originalHeight)
+        guard let cgOutput = context.createCGImage(outputCI, from: renderRect) else {
             return nil
         }
         
-        return UIImage(cgImage: cgOutput)
+        // Draw onto a properly sized RGBA canvas to preserve alpha
+        UIGraphicsBeginImageContextWithOptions(
+            CGSize(width: originalWidth, height: originalHeight),
+            false,  // false = transparent background
+            originalImage.scale
+        )
+        defer { UIGraphicsEndImageContext() }
+        
+        guard let ctx = UIGraphicsGetCurrentContext() else { return nil }
+        
+        // Flip coordinate system (CoreGraphics vs UIKit differ)
+        ctx.translateBy(x: 0, y: CGFloat(originalHeight))
+        ctx.scaleBy(x: 1.0, y: -1.0)
+        
+        ctx.draw(cgOutput, in: renderRect)
+        
+        return UIGraphicsGetImageFromCurrentImageContext()
     }
 }
