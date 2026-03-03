@@ -12,6 +12,13 @@ class MasterPiece: Identifiable {
     @Attribute(.unique) var id: UUID = UUID()
     var date: Date = Date()
     var imageData: Data
+    var boxX: Double?
+    var boxY: Double?
+    
+    // Shelf placement state
+    var isOnShelf: Bool = false
+    var shelfIndex: Int?
+    var pageIndex: Int?
 
     init(imageData: Data) {
         self.imageData = imageData
