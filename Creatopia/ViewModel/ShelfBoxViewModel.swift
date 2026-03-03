@@ -1,37 +1,38 @@
 import SwiftUI
+import SwiftData
 import Combine
+
 
 class ShelfBoxViewModel: ObservableObject {
     
-    @Published var inboxItems: [ShelfItem] = [
-        ShelfItem(imageName: "item1"),
-        ShelfItem(imageName: "item2"),
-        ShelfItem(imageName: "item3"),
-        ShelfItem(imageName: "item4")
-    ]
+    @Published var currentPage: Int = 0
     
-    // كل صفحة فيها 4 رفوف
-    @Published var shelfPages: [[[ShelfItem]]] = [
-        Array(repeating: [], count: 4)
-    ]
-    
-    @Published var currentPage = 0
-    
-    var currentShelves: [[ShelfItem]] {
-        shelfPages[currentPage]
+    // نقل عنصر إلى رف
+    func placePhotoOnShelf(item: ShelfItem, shelfIndex: Int, modelContext: ModelContext) {
+        item.isOnShelf = true
+        item.shelfIndex = shelfIndex
+        item.pageIndex = currentPage
+        
+        try? modelContext.save()
     }
     
-    func placeItem(_ item: ShelfItem, at shelfIndex: Int) {
-        shelfPages[currentPage][shelfIndex].append(item)
-        inboxItems.removeAll { $0 == item }
+    // إرجاع عنصر إلى البوكس مع حفظ مكانه
+    func movePhotoBackToBox(item: ShelfItem, dropX: CGFloat, dropY: CGFloat, modelContext: ModelContext) {
+        item.isOnShelf = false
+        item.shelfIndex = nil
+        item.pageIndex = nil
+        item.boxX = Double(dropX)
+        item.boxY = Double(dropY)
+        
+        try? modelContext.save()
     }
     
-    func nextPage() {
-        if currentPage == shelfPages.count - 1 {
-            // نسوي صفحة جديدة
-            shelfPages.append(Array(repeating: [], count: 4))
+    func nextPage(totalPages: Int) {
+        if currentPage < totalPages - 1 {
+            currentPage += 1
+        } else {
+            currentPage += 1
         }
-        currentPage += 1
     }
     
     func previousPage() {
