@@ -1,9 +1,3 @@
-//
-//  model.swift
-//  Creatopia
-//
-//  Created by shahad khaled on 20/08/1447 AH.
-//
 import SwiftUI
 import SwiftData
 
@@ -12,15 +6,18 @@ class MasterPiece: Identifiable {
     @Attribute(.unique) var id: UUID = UUID()
     var date: Date = Date()
     var imageData: Data
-    var boxX: Double?
-    var boxY: Double?
+    
+    // Box position
+    var boxX: Double? = nil
+    var boxY: Double? = nil
     
     // Shelf placement state
     var isOnShelf: Bool = false
-    var shelfIndex: Int?
-    var pageIndex: Int?
+    var shelfIndex: Int? = nil
+    var pageIndex: Int? = nil
 
     init(imageData: Data) {
+        self.id = UUID()
         self.imageData = imageData
     }
 

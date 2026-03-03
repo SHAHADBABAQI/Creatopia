@@ -8,7 +8,7 @@ class ShelfBoxViewModel: ObservableObject {
     @Published var currentPage: Int = 0
     
     // نقل عنصر إلى رف
-    func placePhotoOnShelf(item: ShelfItem, shelfIndex: Int, modelContext: ModelContext) {
+    func placePhotoOnShelf(item: MasterPiece, shelfIndex: Int, modelContext: ModelContext) {
         item.isOnShelf = true
         item.shelfIndex = shelfIndex
         item.pageIndex = currentPage
@@ -17,7 +17,7 @@ class ShelfBoxViewModel: ObservableObject {
     }
     
     // إرجاع عنصر إلى البوكس مع حفظ مكانه
-    func movePhotoBackToBox(item: ShelfItem, dropX: CGFloat, dropY: CGFloat, modelContext: ModelContext) {
+    func movePhotoBackToBox(item: MasterPiece, dropX: CGFloat, dropY: CGFloat, modelContext: ModelContext) {
         item.isOnShelf = false
         item.shelfIndex = nil
         item.pageIndex = nil

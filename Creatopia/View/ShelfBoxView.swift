@@ -1,19 +1,17 @@
 import SwiftUI
 import SwiftData
 import Combine
-import UniformTypeIdentifiers
-
 
 struct ShelfBoxView: View {
     
-    @Query(sort: \ShelfItem.id, order: .forward) var items: [ShelfItem]
+    @Query(sort: \MasterPiece.date, order: .forward) var items: [MasterPiece]
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
     @StateObject private var viewModel = ShelfBoxViewModel()
     
-    @State private var draggingItem: ShelfItem?
+    @State private var draggingItem: MasterPiece?
     @State private var dragOffset: CGSize = .zero
     
     var body: some View {
@@ -35,8 +33,8 @@ struct ShelfBoxView: View {
                             .resizable()
                             .frame(width: 673, height: 529)
                         
-                        ForEach(Array(items.filter { !$0.isOnShelf }), id: \.id) { item in
-                            if let uiImage = UIImage(named: item.imageName) {
+                        ForEach(items.filter { !$0.isOnShelf }, id: \.id) { item in
+                            if let uiImage = UIImage(data: item.imageData) {
                                 let isDragging = draggingItem?.id == item.id
                                 let baseX = CGFloat(item.boxX ?? fullWidth / 4)
                                 let baseY = CGFloat(item.boxY ?? fullHeight / 2)
@@ -57,14 +55,11 @@ struct ShelfBoxView: View {
                                             }
                                             .onEnded { value in
                                                 let dropPoint = value.location
-                                                
-                                                // إذا وقعت على رف
                                                 if let shelfIndex = shelfIndexForDrag(position: dropPoint) {
                                                     viewModel.placePhotoOnShelf(item: item, shelfIndex: shelfIndex, modelContext: modelContext)
                                                 } else {
                                                     viewModel.movePhotoBackToBox(item: item, dropX: dropPoint.x, dropY: dropPoint.y, modelContext: modelContext)
                                                 }
-                                                
                                                 withAnimation(.easeOut) {
                                                     draggingItem = nil
                                                     dragOffset = .zero
@@ -81,12 +76,10 @@ struct ShelfBoxView: View {
                     VStack {
                         ZStack {
                             ForEach(0..<4) { index in
-                                shelfView(index: index, x: 366, y: [140,365,589,814][index])
+                                shelfView(index: index, x: 366, y: [140, 365, 589, 814][index])
                             }
                         }
-                        
                         Spacer()
-                        
                         HStack(spacing: 40) {
                             paginationButton(icon: "chevron.left", action: viewModel.previousPage, posX: 120)
                             paginationButton(icon: "chevron.right", action: { viewModel.nextPage(totalPages: items.count) }, posX: 250)
@@ -110,8 +103,12 @@ struct ShelfBoxView: View {
                 .frame(width: 572, height: 78)
             
             HStack(spacing: 10) {
-                ForEach(Array(items.filter { $0.isOnShelf && $0.shelfIndex == index && $0.pageIndex == viewModel.currentPage }), id: \.id) { item in
-                    if let uiImage = UIImage(named: item.imageName) {
+                ForEach(items.filter {
+                    $0.isOnShelf &&
+                    $0.shelfIndex == index &&
+                    $0.pageIndex == viewModel.currentPage
+                }, id: \.id) { item in
+                    if let uiImage = UIImage(data: item.imageData) {
                         Image(uiImage: uiImage)
                             .resizable()
                             .scaledToFit()
@@ -157,7 +154,7 @@ struct ShelfBoxView: View {
         .position(x: 100, y: 900)
     }
     
-    func paginationButton(icon: String, action: @escaping ()->Void, posX: CGFloat) -> some View {
+    func paginationButton(icon: String, action: @escaping () -> Void, posX: CGFloat) -> some View {
         Button(action: action) {
             Image(systemName: icon)
                 .resizable()
@@ -170,7 +167,4 @@ struct ShelfBoxView: View {
         }
         .position(x: posX, y: 422)
     }
-}
-#Preview {
-    ShelfBoxView()
 }

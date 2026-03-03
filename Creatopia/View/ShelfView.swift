@@ -8,7 +8,7 @@ struct ShelfView: View {
     
     @StateObject private var viewModel = ShelfBoxViewModel()
     
-    @Query(sort: \ShelfItem.id, order: .forward) var items: [ShelfItem]
+    @Query(sort: \MasterPiece.id, order: .forward) var items: [MasterPiece]
     
     var body: some View {
         ZStack {
@@ -25,14 +25,19 @@ struct ShelfView: View {
                 ForEach(xPositions, id: \.self) { xPos in
                     ForEach(yPositions, id: \.self) { yPos in
                         let shelfIndex = yPositions.firstIndex(of: yPos)!
+                        
                         Image("shelf1")
                             .resizable()
                             .frame(width: 572, height: 78)
                             .position(x: xPos, y: yPos)
                         
                         HStack(spacing: 10) {
-                            ForEach(items.filter { $0.isOnShelf && $0.shelfIndex == shelfIndex && $0.pageIndex == viewModel.currentPage }) { item in
-                                if let uiImage = UIImage(named: item.imageName) {
+                            ForEach(items.filter {
+                                $0.isOnShelf &&
+                                $0.shelfIndex == shelfIndex &&
+                                $0.pageIndex == viewModel.currentPage
+                            }) { item in
+                                if let uiImage = UIImage(data: item.imageData) { // ✅ Fixed
                                     Image(uiImage: uiImage)
                                         .resizable()
                                         .scaledToFit()
@@ -51,6 +56,7 @@ struct ShelfView: View {
                         }
                         .padding(.leading, 20)
                         .padding(.top, -30)
+                        .position(x: xPos, y: yPos - 30) // ✅ Align HStack with shelf
                     }
                 }
             }
@@ -79,6 +85,7 @@ struct ShelfView: View {
         .navigationBarHidden(true)
     }
 }
+
 #Preview {
     ShelfView()
 }

@@ -5,7 +5,7 @@ class ShelfGameViewModel: ObservableObject {
     
     struct PlacedShelfItem: Identifiable {
         let id = UUID()
-        var item: ShelfItem
+        var item: MasterPiece
         var position: CGPoint
         var startPosition: CGPoint
         var isPlaced: Bool = false
@@ -32,25 +32,8 @@ class ShelfGameViewModel: ObservableObject {
             CGPoint(x: 990, y: 875)
         ]
     ]
+   
     
-    init() {
-        setupItems()
-    }
-    
-    func setupItems() {
-        items = [
-            PlacedShelfItem(
-                item: ShelfItem(imageName: "item1"),
-                position: CGPoint(x: 250, y: 500),
-                startPosition: CGPoint(x: 250, y: 500)
-            ),
-            PlacedShelfItem(
-                item: ShelfItem(imageName: "item2"),
-                position: CGPoint(x: 350, y: 600),
-                startPosition: CGPoint(x: 350, y: 600)
-            )
-        ]
-    }
     
     // تغيير صفحة الرفوف
     func nextShelf() {
