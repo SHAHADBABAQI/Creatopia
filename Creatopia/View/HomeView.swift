@@ -26,7 +26,7 @@ struct HomeView: View {
                 
                 // Art
                 NavigationLink {
-                    drawView()
+                    DrawView()
                         .onAppear {
                             // Restart the wobble animation on navigation if desired
                             moveArt = false

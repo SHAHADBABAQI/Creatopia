@@ -1,247 +1,137 @@
-
 import SwiftUI
 import SwiftData
-import Combine
 
-struct drawView: View {
+struct DrawView: View {
     @Environment(\.modelContext) private var modelContext
     
-    @State private var animate: Bool = false
-    @State private var showCamera = false
-    @State private var capturedImage: UIImage?
-    @State private var isProcessing = false
-    @State private var navigateToShelfBox = false  // ✅ Add navigation trigger
-
-    static let duration = 900
+    @State private var strokes: [Stroke] = []
+    @State private var currentStroke: Stroke?
     
-    @State private var timeRemaining = DIYtimer.duration
-    @State private var showConfetti = false
-    @State private var timerFinished = false
-    @State private var isRunning = true
-    @State private var timeConsumed: Int = 0
-
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-
-    private var finishedMessage: String {
-        if timeConsumed < 60 {
-            let seconds = max(0, timeConsumed)
-            return "you finished crafting in \(seconds) second\(seconds == 1 ? "" : "s"), yay!"
-        } else {
-            let minutes = max(1, timeConsumed / 60)
-            return "you finished crafting in \(minutes) minute\(minutes == 1 ? "" : "s"), yay!"
-        }
-    }
-
+    @State private var selectedColor: Color = .black
+    @State private var lineWidth: CGFloat = 6
+    @State private var isEraser: Bool = false
+    
+    @State private var isProcessing = false
+    @State private var navigateToShelfBox = false
+    
     var body: some View {
         NavigationStack {
             ZStack {
-                Image("background2")
-                    .resizable()
-                    .frame(width: 1370, height: 1037)
-                
-                ZStack {
-                    VStack(spacing: 60) {
-                        Text(timerFinished ? "WELL DONE!" : "GO GO GO!")
-                            .font(.system(size: 90, weight: .bold))
-                            .foregroundColor(.white)
-                            .scaleEffect(animate ? 1.3 : 1.0)
-                            .onAppear {
-                                withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                                    animate.toggle()
-                                }
-                            }
-                        
-                        if !timerFinished {
-                            Text("Let's make something amazing in the next \(DIYtimer.duration / 60) minutes")
-                                .font(.system(size: 36, weight: .medium))
-                                .foregroundColor(.white.opacity(0.95))
-                                .transition(.opacity)
-                        } else {
-                            Text(finishedMessage)
-                                .font(.system(size: 36, weight: .medium))
-                                .foregroundColor(.white.opacity(0.95))
-                                .transition(.opacity)
+                // Full-screen Canvas
+                Canvas { context, size in
+                    // Draw completed strokes
+                    for stroke in strokes {
+                        var path = Path()
+                        guard let first = stroke.points.first else { continue }
+                        path.move(to: first)
+                        for point in stroke.points.dropFirst() {
+                            path.addLine(to: point)
                         }
-                        
-                        if !timerFinished {
-                            Text(timeString(from: timeRemaining))
-                                .font(.system(size: 60, weight: .semibold))
-                                .foregroundColor(.white)
-                        }
-                        
-                        if !timerFinished {
-                            VStack(spacing: 90) {
-                                HStack(spacing: 250) {
-                                    if timeRemaining > 0 {
-                                        Button(action: {
-                                            isRunning.toggle()
-                                        }) {
-                                            ZStack {
-                                                Circle()
-                                                    .fill(Color.ButtonYellow)
-                                                    .frame(width: 100, height: 100)
-                                                Image(systemName: isRunning ? "pause.fill" : "play.fill")
-                                                    .resizable()
-                                                    .bold()
-                                                    .scaledToFit()
-                                                    .frame(width: 50, height: 50)
-                                                    .foregroundColor(.black)
-                                            }
-                                            .opacity(0.8)
-                                        }
-                                    }
-                                    
-                                    Button(action: {
-                                        isRunning = false
-                                        timeConsumed = DIYtimer.duration - timeRemaining
-                                        timerFinished = true
-                                        showConfetti = true
-                                    }) {
-                                        ZStack {
-                                            Circle()
-                                                .fill(Color.ButtonYellow)
-                                                .frame(width: 100, height: 100)
-                                            Image(systemName: "checkmark")
-                                                .resizable()
-                                                .bold()
-                                                .scaledToFit()
-                                                .frame(width: 50, height: 50)
-                                                .foregroundColor(.black)
-                                        }
-                                    }
-                                    
-                                    Button(action: {
-                                        timeRemaining = DIYtimer.duration
-                                        timerFinished = false
-                                        showConfetti = false
-                                        isRunning = true
-                                        timeConsumed = 0
-                                    }) {
-                                        ZStack {
-                                            Circle()
-                                                .fill(Color.ButtonYellow)
-                                                .frame(width: 100, height: 100)
-                                            Image(systemName: "arrow.clockwise")
-                                                .resizable()
-                                                .bold()
-                                                .scaledToFit()
-                                                .frame(width: 50, height: 50)
-                                                .foregroundColor(.black)
-                                        }
-                                        .opacity(0.8)
-                                    }
-                                }
-                            }
-                            .padding(.top, 20)
-                            .padding(.bottom, -40)
-                        }
+                        context.stroke(
+                            path,
+                            with: .color(stroke.color),
+                            lineWidth: stroke.lineWidth
+                        )
                     }
-                    .onReceive(timer) { _ in
-                        guard isRunning else { return }
-                        if timeRemaining > 0 {
-                            timeRemaining -= 1
-                            if timeRemaining == 0 {
-                                timerFinished = true
-                                showConfetti = true
-                                timeConsumed = DIYtimer.duration
+                    // Draw current stroke live (in-progress)
+                    if let stroke = currentStroke {
+                        var path = Path()
+                        if let first = stroke.points.first {
+                            path.move(to: first)
+                            for point in stroke.points.dropFirst() {
+                                path.addLine(to: point)
                             }
-                        }
-                    }
-                    
-                    if timerFinished {
-                        ZStack {
-                            VStack {
-                                Spacer()
-                                
-                                HStack {
-                                    // LEFT BUTTON - Home
-                                    NavigationLink(destination: HomeView()) {
-                                        ZStack {
-                                            Circle()
-                                                .fill(Color.ButtonYellow)
-                                                .frame(width: 100, height: 100)
-                                            Image(systemName: "house.fill")
-                                                .resizable()
-                                                .frame(width: 80, height: 70)
-                                                .foregroundColor(.black)
-                                        }
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    // RIGHT BUTTON - Camera with Auto-Navigation
-                                    Button(action: { showCamera = true }) {
-                                        ZStack {
-                                            Circle()
-                                                .fill(Color.ButtonYellow)
-                                                .frame(width: 100, height: 100)
-                                            Image(systemName: "camera.fill")
-                                                .resizable()
-                                                .frame(width: 60, height: 60)
-                                                .foregroundColor(.black)
-                                        }
-                                    }
-                                    .sheet(isPresented: $showCamera) {
-                                        CameraView(
-                                            onImagePicked: { _ in
-                                                isProcessing = true
-                                            },
-                                            onProcessedImage: { processedImage in
-                                                // Save to SwiftData
-                                                if let data = processedImage.pngData() {
-                                                    let newPhoto = MasterPiece(imageData: data)
-                                                    modelContext.insert(newPhoto)
-                                                    try? modelContext.save()
-                                                    print("Photo saved to database!")
-                                                }
-                                                capturedImage = processedImage
-                                                isProcessing = false
-                                                
-                                                // ✅ Navigate to ShelfBoxView after saving
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                    navigateToShelfBox = true
-                                                }
-                                            }
-                                        )
-                                    }
-                                }
-                                .padding(.horizontal, 24)
-                                .padding(.bottom, 20)
-                            }
-                        }
-                        .frame(width: 760, height: 510)
-                    }
-                    
-                    if showConfetti {
-                        ConfettiView()
-                    }
-                    
-                    // Processing overlay
-                    if isProcessing {
-                        ZStack {
-                            Color.black.opacity(0.4)
-                                .ignoresSafeArea()
-                            
-                            VStack(spacing: 20) {
-                                ProgressView()
-                                    .scaleEffect(2)
-                                    .tint(.white)
-                                Text("Processing photo...")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                            }
-                            .padding(40)
-                            .background(Color(red: 0.984, green: 0.863, blue: 0.494))
-                            .cornerRadius(20)
+                            context.stroke(
+                                path,
+                                with: .color(stroke.color),
+                                lineWidth: stroke.lineWidth
+                            )
                         }
                     }
                 }
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            if currentStroke == nil {
+                                currentStroke = Stroke(
+                                    points: [value.location],
+                                    color: isEraser ? Color.white : selectedColor,
+                                    lineWidth: lineWidth
+                                )
+                            } else {
+                                currentStroke?.points.append(value.location)
+                            }
+                        }
+                        .onEnded { _ in
+                            if let stroke = currentStroke {
+                                strokes.append(stroke)
+                            }
+                            currentStroke = nil
+                        }
+                )
+                .ignoresSafeArea() // make whole screen drawable
                 
-                // ✅ Hidden NavigationLink for programmatic navigation
-                NavigationLink(
-                    destination: ShelfBoxView(),
-                    isActive: $navigateToShelfBox
-                ) {
+                // Toolbar overlay
+                VStack {
+                    Spacer()
+                    HStack(spacing: 14) {
+                        colorButton(.black)
+                        colorButton(.white)
+                        colorButton(.red)
+                        colorButton(.blue)
+                        colorButton(.green)
+                        colorButton(.yellow)
+                        colorButton(.purple)
+                        colorButton(.orange)
+                        
+                        Divider().frame(height: 24)
+                        
+                        Button {
+                            isEraser.toggle()
+                        } label: {
+                            Image(systemName: "eraser")
+                                .foregroundColor(isEraser ? .red : .black)
+                        }
+                        
+                        Slider(value: $lineWidth, in: 2...14)
+                            .frame(width: 100)
+                        
+                        Button(action: { saveDrawing() }) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.yellow)
+                                    .frame(width: 64, height: 64)
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 28, weight: .bold))
+                                    .foregroundColor(.black)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .contentShape(Circle())
+                    }
+                    .padding()
+                    .background(Color(white: 0.9).opacity(0.7))
+                }
+                
+                // Processing overlay
+                if isProcessing {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                    VStack(spacing: 20) {
+                        ProgressView()
+                            .scaleEffect(2)
+                            .tint(.white)
+                        Text("Processing drawing...")
+                            .foregroundColor(.white)
+                            .font(.headline)
+                    }
+                    .padding(40)
+                    .background(Color.yellow)
+                    .cornerRadius(20)
+                }
+                
+                // Hidden NavigationLink for programmatic navigation
+                NavigationLink(destination: ShelfBoxView(), isActive: $navigateToShelfBox) {
                     EmptyView()
                 }
                 .hidden()
@@ -249,68 +139,85 @@ struct drawView: View {
         }
         .navigationBarBackButtonHidden(true)
     }
-
-    private func timeString(from totalSeconds: Int) -> String {
-        let hour = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let seconds = totalSeconds % 60
-        return String(format: "%02d:%02d:%02d", hour, minutes, seconds)
-    }
-
-    struct ConfettiView: View {
-        let colors: [Color] = [.red, .purple, .yellow, .green, .orange, .pink, .white, .mint]
-
-        var body: some View {
-            GeometryReader { geo in
-                ForEach(0..<500, id: \.self) { _ in
-                    ConfettiPiece(
-                        color: colors.randomElement()!,
-                        x: CGFloat.random(in: 0...geo.size.width),
-                        delay: Double.random(in: 0...3),
-                        availableHeight: geo.size.height
-                    )
-                }
+    
+    // MARK: - Color Button Helper
+    private func colorButton(_ color: Color) -> some View {
+        Circle()
+            .fill(color)
+            .frame(width: 24, height: 24)
+            .overlay(
+                Circle()
+                    .stroke(selectedColor == color && !isEraser ? Color.black : .clear, lineWidth: 2)
+            )
+            .onTapGesture {
+                selectedColor = color
+                isEraser = false
             }
-            .ignoresSafeArea()
+    }
+    
+    // MARK: - SwiftData Saving
+    private func saveDrawing() {
+        guard !strokes.isEmpty || currentStroke != nil else { return }
+        isProcessing = true
+        
+        // Include any in-progress stroke before saving
+        var allStrokes = strokes
+        if let current = currentStroke {
+            allStrokes.append(current)
+        }
+        
+        let screenSize = UIScreen.main.bounds.size // full screen size
+        let image = exportDrawing(strokes: allStrokes, size: screenSize)
+        if let data = image.pngData() {
+            let newPhoto = MasterPiece(imageData: data)
+            modelContext.insert(newPhoto)
+            try? modelContext.save()
+            print("Drawing saved to database!")
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            isProcessing = false
+            navigateToShelfBox = true
         }
     }
-
-    struct ConfettiPiece: View {
-        let color: Color
-        let x: CGFloat
-        let delay: Double
-        let availableHeight: CGFloat
-
-        @State private var y: CGFloat = -20
-        @State private var rotation: Double = 0
-
-        var body: some View {
-            Rectangle()
-                .fill(color)
-                .frame(width: 8, height: 14)
-                .rotationEffect(.degrees(rotation))
-                .position(x: x, y: y)
-                .onAppear {
-                    withAnimation(
-                        .easeIn(duration: 2.5)
-                            .delay(delay)
-                    ) {
-                        y = availableHeight + 20
-                        rotation = Double.random(in: 0...360)
-                    }
+    
+    // MARK: - Export Canvas to UIImage
+    private func exportDrawing(strokes: [Stroke], size: CGSize) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { ctx in
+            UIColor.white.setFill()
+            ctx.fill(CGRect(origin: .zero, size: size))
+            
+            for stroke in strokes {
+                guard let first = stroke.points.first else { continue }
+                let path = UIBezierPath()
+                path.move(to: first)
+                for point in stroke.points.dropFirst() {
+                    path.addLine(to: point)
                 }
+                path.lineWidth = stroke.lineWidth
+                UIColor(stroke.color).setStroke()
+                path.stroke()
+            }
         }
     }
 }
 
+// MARK: - Stroke Model
+struct Stroke {
+    var points: [CGPoint]
+    var color: Color
+    var lineWidth: CGFloat
+}
+
+// MARK: - Preview
 #Preview {
     do {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: MasterPiece.self, configurations: config)
-        
-        return drawView()
+        return DrawView()
             .modelContainer(container)
     } catch {
-        return drawView()
+        return DrawView()
     }
 }
