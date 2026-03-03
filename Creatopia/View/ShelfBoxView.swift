@@ -1,18 +1,14 @@
 import SwiftUI
 import SwiftData
 import Combine
-import UniformTypeIdentifiers // هذي هي المكتبة اللي سألتي عنها
-
-// MARK: - View
+import UniformTypeIdentifiers
 struct ShelfBoxView: View {
     
-    // جلب الصور الحقيقية من SwiftData (شغل زميلتك)
     @Query(sort: \MasterPiece.date, order: .forward) var photos: [MasterPiece]
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
-    // استخدام الـ ViewModel الخاص بالرفوف
     @StateObject private var viewModel = LocalShelfBoxViewModel()
     
     @State private var draggingPhoto: MasterPiece?
@@ -20,7 +16,6 @@ struct ShelfBoxView: View {
     
     var body: some View {
         ZStack {
-            // 1. الخلفية
             Image("shelfbox")
                 .resizable()
                 .scaledToFill()
@@ -32,13 +27,11 @@ struct ShelfBoxView: View {
                 
                 HStack(spacing: 0) {
                     
-                    // 2. الجانب الأيسر (صندوق الوارد - Inbox)
                     ZStack {
                         Image("inbox")
                             .resizable()
                             .frame(width: 673, height: 529)
                         
-                        // عرض الصور المأخوذة من الكاميرا
                         ForEach(Array(photos.enumerated()), id: \.element.id) { index, photo in
                             if let uiImage = UIImage(data: photo.imageData) {
                                 Image(uiImage: uiImage)
@@ -59,12 +52,10 @@ struct ShelfBoxView: View {
                                             .onEnded { value in
                                                 let dropPoint = value.location
                                                 
-                                                // الحسابات اللي ضبطناها مع بعض للرفوف
                                                 if let targetIndex = shelfIndexForDrag(position: dropPoint) {
                                                     let shelfStartX: CGFloat = 366 - (572 / 2)
                                                     let localX = dropPoint.x - shelfStartX
                                                     
-                                                    // نقل الصورة من البوكس للرف
                                                     placePhotoOnShelf(photo, at: targetIndex, dropX: localX)
                                                 }
                                                 
@@ -80,7 +71,6 @@ struct ShelfBoxView: View {
                     .frame(width: fullWidth / 2, height: fullHeight)
                     .position(x: fullWidth / 3.80, y: fullHeight / 2)
                     
-                    // 3. الجانب الأيمن (الرفوف)
                     VStack {
                         ZStack {
                             shelfView(index: 0, x: 366, y: 140)
@@ -91,7 +81,6 @@ struct ShelfBoxView: View {
                         
                         Spacer()
                         
-                        // أزرار التنقل (يمين - يسار)
                         HStack(spacing: 40) {
                             paginationButton(icon: "chevron.left", action: viewModel.previousPage, posX: 120)
                             paginationButton(icon: "chevron.right", action: viewModel.nextPage, posX: 250)
@@ -102,7 +91,6 @@ struct ShelfBoxView: View {
                 }
             }
             
-            // 4. زر العودة (Home)
             homeButton
         }
         .navigationBarHidden(true)
@@ -116,7 +104,6 @@ struct ShelfBoxView: View {
                 .frame(width: 572, height: 78)
             
             HStack(spacing: 10) {
-                // الصور اللي استقرت على الرف
                 ForEach(viewModel.shelfPages[viewModel.currentPage][index]) { photo in
                     if let uiImage = UIImage(data: photo.imageData) {
                         Image(uiImage: uiImage)
@@ -127,19 +114,16 @@ struct ShelfBoxView: View {
                 }
             }
             .padding(.leading, 20)
-            .padding(.top, -30) // لرفع الصورة قليلاً فوق الرف
-        }
+            .padding(.top, -30)   }
         .position(x: x, y: y)
     }
     
-    // دالة النقل الأساسية
     func placePhotoOnShelf(_ photo: MasterPiece, at index: Int, dropX: CGFloat) {
         viewModel.addPhotoToShelf(photo, shelfIndex: index, dropX: dropX)
-        modelContext.delete(photo) // حذفها من صندوق الوارد في الداتا
+        modelContext.delete(photo)
         try? modelContext.save()
     }
     
-    // دالة تحديد رقم الرف بناءً على مكان الإفلات
     func shelfIndexForDrag(position: CGPoint) -> Int? {
         let shelvesY: [CGFloat] = [140, 365, 589, 814]
         let tolerance: CGFloat = 100
@@ -151,7 +135,6 @@ struct ShelfBoxView: View {
         return nil
     }
 
-    // MARK: - Helpers (تنسيقات عشوائية لتوزيع الصور)
     func getRotation(for index: Int) -> Double {
         let rotations: [Double] = [-12, 6, -5, 10, -8, 4]
         return rotations[index % rotations.count]
@@ -208,7 +191,6 @@ final class LocalShelfBoxViewModel: ObservableObject {
     }
 }
 
-// MARK: - Preview
 #Preview {
     ShelfBoxView()
 }
