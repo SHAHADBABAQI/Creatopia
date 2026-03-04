@@ -17,59 +17,32 @@ struct RoomView: View {
 
     let instructionCards: [InstructionCard] = [
         InstructionCard(
-            title: "Welcome, little creator!",
-            description: "Let’s make something fun today!",
+            title: String(localized: "instruction.welcome.title"),
+            description: String(localized: "instruction.welcome.description"),
             imageName: "welcomeImage"
         ),
 
         InstructionCard(
-            title: " The Magic Table",
-            description: """
-Tap the table and shake your device! 🫧
-
-Magical bubbles will appear with surprise tools.
-Find these tools around you and start building your very own monster! 👾
-
-When you finish…
-📸 Take a photo of your masterpiece!
-""",
+            title: String(localized: "instruction.table.title"),
+            description: String(localized: "instruction.table.description"),
             imageName: "tableImage"
         ),
 
         InstructionCard(
-            title: "The Creative Board",
-            description: """
-Love drawing?
-
-Tap the board and start drawing right on your iPad!
-Use your imagination and create anything you like 🌈✨
-
-There are no rules — just creativity!
-""",
+            title: String(localized: "instruction.board.title"),
+            description: String(localized: "instruction.board.description"),
             imageName: "boardImage"
         ),
 
         InstructionCard(
-            title: "The Treasure Box",
-            description: """
-This is your special treasure box!
-
-All your creations are saved here safely 💛
-So you’ll never lose your amazing ideas.
-""",
+            title: String(localized: "instruction.box.title"),
+            description: String(localized: "instruction.box.description"),
             imageName: "boxImage"
         ),
 
         InstructionCard(
-            title: " Your Mini Museum",
-            description: """
-Welcome to your mini museum!
-
-Place your masterpieces on the shelves
-and proudly show everyone what you created 🌟
-
-You are the artist!
-""",
+            title: String(localized: "instruction.museum.title"),
+            description: String(localized: "instruction.museum.description"),
             imageName: "shelfImage"
         )
     ]

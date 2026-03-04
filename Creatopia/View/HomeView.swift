@@ -1,11 +1,3 @@
-//
-//  HomeView.swift
-//  Creatopia
-//
-//  Created by Maram Ibrahim  on 21/08/1447 AH.
-//
-
-
 import SwiftUI
 
 struct HomeView: View {
@@ -16,25 +8,24 @@ struct HomeView: View {
     @State private var moveBox = false
 
     var body: some View {
-        NavigationStack{
+        NavigationStack {
             ZStack {
-                
+
                 Image("home")
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()
-                
+
                 // Art
                 NavigationLink {
                     DrawView()
                         .onAppear {
-                            // Restart the wobble animation on navigation if desired
                             moveArt = false
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                                 moveArt = true
                             }
-                            }
-                        } label: {
+                        }
+                } label: {
                     Image("Art")
                         .resizable()
                         .frame(width: 199, height: 247)
@@ -43,13 +34,11 @@ struct HomeView: View {
                 }
                 .position(x: 115, y: 189)
                 .onAppear { moveArt = true }
-                
-                // shelf
+
+                // Shelf
                 NavigationLink {
-                    // Destination when tapping the table
                     ShelfView()
                         .onAppear {
-                            // Restart the wobble animation on navigation if desired
                             moveShelf = false
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                                 moveShelf = true
@@ -64,13 +53,11 @@ struct HomeView: View {
                 }
                 .position(x: 1017, y: 211)
                 .onAppear { moveShelf = true }
-                
-                // table
+
+                // Table
                 NavigationLink {
-                    // Destination when tapping the table
                     Shake()
                         .onAppear {
-                            // Restart the wobble animation on navigation if desired
                             moveTable = false
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                                 moveTable = true
@@ -85,19 +72,16 @@ struct HomeView: View {
                 }
                 .position(x: 702, y: 656)
                 .onAppear { moveTable = true }
-                
-                // box
+
+                // Box
                 NavigationLink {
-                    // Destination when tapping the table
                     ShelfBoxView()
                         .onAppear {
-                            // Restart the wobble animation on navigation if desired
                             moveBox = false
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                                 moveBox = true
                             }
                         }
-
                 } label: {
                     Image("box")
                         .resizable()
@@ -107,10 +91,12 @@ struct HomeView: View {
                 }
                 .position(x: 180, y: 795)
                 .onAppear { moveBox = true }
+
             }
+            // 🔹 Force all positions to ignore RTL
+            .environment(\.layoutDirection, .leftToRight)
         }
         .navigationBarBackButtonHidden(true)
-
     }
 }
 
