@@ -3,25 +3,48 @@
 //  Creatopia
 //
 //  Created by Maram Ibrahim  on 21/08/1447 AH.
-//
-
+//import SwiftUI
 import SwiftUI
 
 struct RoomView: View {
 
-    struct GameItem: Identifiable {
+    struct InstructionCard: Identifiable {
         let id = UUID()
-        let name: String
-        let instruction: String
-        let position: CGPoint
-        let size: CGSize
+        let title: String
+        let description: String
+        let imageName: String
     }
 
-    let gameItems: [GameItem] = [
-        GameItem(name: "طاولة", instruction: "Shake it and see the magic!", position: CGPoint(x: 616, y: 580), size: CGSize(width: 300, height: 180)),
-        GameItem(name: "رف", instruction: "Put your things here\nKeep them nice and tidy", position: CGPoint(x: 1019, y: 281), size: CGSize(width: 150, height: 120)),
-        GameItem(name: "لوحة", instruction: "Draw your ideas!", position: CGPoint(x: 144, y: 384), size: CGSize(width: 200, height: 150)),
-        GameItem(name: "صندوق", instruction: "All your things are here!\nTap to explore", position: CGPoint(x: 161, y: 900), size: CGSize(width: 150, height: 150))
+    let instructionCards: [InstructionCard] = [
+        InstructionCard(
+            title: String(localized: "instruction.welcome.title"),
+            description: String(localized: "instruction.welcome.description"),
+            imageName: "welcomeImage"
+        ),
+
+        InstructionCard(
+            title: String(localized: "instruction.table.title"),
+            description: String(localized: "instruction.table.description"),
+            imageName: "tableImage"
+        ),
+
+        InstructionCard(
+            title: String(localized: "instruction.board.title"),
+            description: String(localized: "instruction.board.description"),
+            imageName: "boardImage"
+        ),
+
+        InstructionCard(
+            title: String(localized: "instruction.box.title"),
+            description: String(localized: "instruction.box.description"),
+            imageName: "boxImage"
+        ),
+
+        InstructionCard(
+            title: String(localized: "instruction.museum.title"),
+            description: String(localized: "instruction.museum.description"),
+            imageName: "shelfImage"
+        )
     ]
 
     @State private var instructionIndex = 0
@@ -49,51 +72,68 @@ struct RoomView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
 
-            ForEach(gameItems) { item in
-                Button {
-                } label: {
-                    Color.clear
-                        .frame(width: item.size.width, height: item.size.height)
-                }
-                .position(item.position)
-            }
+            if showInstructions && instructionIndex < instructionCards.count {
 
-            if showInstructions && instructionIndex < gameItems.count {
-                let currentItem = gameItems[instructionIndex]
+                let currentCard = instructionCards[instructionIndex]
 
-                HStack(spacing: 15) {
+                VStack(spacing: 25) {
 
-                    Text(currentItem.instruction)
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(.black)
-                        .multilineTextAlignment(.leading)
+                    Text(currentCard.title)
+                        .font(.system(size: 44, weight: .bold))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
 
-                    Button {
-                        let key = "seen_\(currentItem.name)"
-                        UserDefaults.standard.set(true, forKey: key)
+                    Text(currentCard.description)
+                        .font(.system(size: 37, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.95))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 30)
 
-                        instructionIndex += 1
+                    Image(currentCard.imageName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 160)
+                        .cornerRadius(20)
+                        .padding(.horizontal, 40)
 
-                        if instructionIndex >= gameItems.count {
-                            showInstructions = false
-                            showHome = true
+                    HStack {
+                        Spacer()
+
+                        Button {
+                            withAnimation {
+                                instructionIndex += 1
+
+                                if instructionIndex >= instructionCards.count {
+                                    showInstructions = false
+
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        showHome = true
+                                    }
+                                }
+                            }
+                        } label: {
+                            Circle()
+                                .fill(Color.yellow)
+                                .frame(width: 70, height: 70)
+                                .overlay(
+                                    Image(systemName: "arrow.right")
+                                        .font(.system(size: 28, weight: .bold))
+                                        .foregroundColor(.black)
+                                )
+                                .shadow(radius: 5)
                         }
-
-                    } label: {
-                        Image(systemName: "arrow.right.circle.fill")
-                            .resizable()
-                            .frame(width: 40, height: 40)
-                            .foregroundColor(.yellow)
                     }
+                    .padding(.horizontal, 30)
                 }
-                .padding()
-                .background(Color.white)
-                .cornerRadius(15)
-                .shadow(radius: 5)
-                .position(
-                    x: currentItem.position.x,
-                    y: currentItem.position.y - currentItem.size.height/2 - 60
+                .padding(.vertical, 40)
+                .frame(maxWidth: 850)
+                .background(
+                    RoundedRectangle(cornerRadius: 30)
+                        .fill(Color(red: 1.0, green: 0.70, blue: 0.85))
                 )
+                .shadow(radius: 15)
+                .padding()
+                .transition(.scale.combined(with: .opacity))
             }
         }
     }

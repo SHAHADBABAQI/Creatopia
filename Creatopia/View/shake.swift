@@ -401,10 +401,6 @@ struct Shake: View {
 
                     Spacer()
 
-                    Text("A gentle shake… Unlock three little surprises")
-                        .font(.system(size: footerSize, weight: .bold))
-                        .opacity(0.9)
-                        .padding(.bottom, 80)
                 }
 
                 // ✅ Removed BigSurprisesOverlay
