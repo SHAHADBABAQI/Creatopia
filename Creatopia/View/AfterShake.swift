@@ -286,8 +286,8 @@ struct AfterShake: View {
 
     // ── Replace "box" with your real asset names ──
     private let allImages = [
-        "box", "box", "box", "box", "box", "box",
-        "box", "box", "box", "box", "box", "box"
+        "PRE1", "PRE2", "PRE3", "PRE4", "PRE5", "PRE6",
+        
     ]
 
     @State private var showBubbles    = false
